@@ -10,9 +10,13 @@ public:
     virtual ~Object() = default;
     std::string obj_class;
     std::string obj_subclass;
+    std::string texture;
+
+    int x,y,z,id;
 
     virtual void describe() const {
-        std::cout << "Generic Object: " << obj_class << " - " << obj_subclass << "\n";
+        std::cout << "OBJECT ID " << id << " CLASS " << obj_class << ":" << obj_subclass << " TEXTURE " << texture << " COORDS " << x << " " << y << " " << z << std::endl;
+
     }
 };
 

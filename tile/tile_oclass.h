@@ -11,14 +11,10 @@
 // Tile object class
 class Tile_OBJ : public Object {
 public:
-    std::string texture;
+    
 
     Tile_OBJ() {
         obj_class = "tile"; // set the obj_class
-    }
-
-    void describe() const override {
-        std::cout << obj_class << ":" << obj_subclass << ", texture: " << texture << "\n";
     }
 };
 
@@ -26,6 +22,7 @@ public:
 // Register the object type
 // This must be AFTER the full class definition
 // Uses a static struct instead of lambda+bool to avoid compiler errors
+// somehow this works but a lambda+bool doesnt lol
 namespace {
     struct Tile_OBJ_Registrar {
         Tile_OBJ_Registrar() {

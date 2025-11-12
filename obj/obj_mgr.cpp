@@ -1,4 +1,4 @@
-#include "engine/obj/obj_load.h"
+#include "engine/obj/obj_mgr.h"
 #include <fstream>
 #include <iostream>
 #include "game/objclass.h"
@@ -45,13 +45,42 @@ std::unique_ptr<Object> objManager::obj_load(const std::string& obj_class, const
 
     if (it != objectDefs.end()) {
         // Check if object has a 'texture' member
-        if (auto tileObj = dynamic_cast<Tile_OBJ*>(obj.get())) {
-            tileObj->texture = it->texture;
-        }
+        
+            obj->texture = it->texture;
+        
         // For other object types, you could extend this with similar dynamic_cast checks
     } else {
         std::cerr << "Warning: subclass '" << obj_subclass << "' not found for class '" << obj_class << "'\n";
     }
 
     return obj;
+}
+
+void objManager::printRegistry() const {
+    std::cout << "=== Object Registry ===\n";
+    for (const auto& obj : registry) {
+        if (obj) obj->describe();
+    }
+    std::cout << "=======================\n";
+}
+
+
+Object* objManager::instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z) {
+    // Create the object (using your obj_load function)
+    auto obj = obj_load(obj_class, obj_subclass);
+    if (!obj) {
+        std::cerr << "Failed to instantiate: " << obj_class << ":" << obj_subclass << "\n";
+        return nullptr;
+    }
+
+    // Set position
+    obj->x = x;
+    obj->y = y;
+    obj->z = z;
+
+    // Store the object in the registry
+    registry.push_back(std::move(obj));
+
+    // Return a raw pointer (for convenience)
+    return registry.back().get();
 }

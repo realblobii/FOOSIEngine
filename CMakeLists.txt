@@ -7,7 +7,7 @@ add_library(engine STATIC
     texture.cpp
     tile/tile.cpp
     tile/tilemap.cpp
-    obj/obj_load.cpp
+    obj/obj_mgr.cpp
 )
 
 find_package(PkgConfig REQUIRED)

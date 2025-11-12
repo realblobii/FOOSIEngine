@@ -14,11 +14,18 @@ class objManager {
 public:
     objManager(const std::string& objFile);
 
-    // Creates an object given obj_class and obj_subclass
     std::unique_ptr<Object> obj_load(const std::string& obj_class, const std::string& obj_subclass);
 
+    // Instantiates an object and stores it in the registry
+    Object* instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z);
+
+    // Registry of active game objects
+    std::vector<std::unique_ptr<Object>> registry;
+
+    void printRegistry() const;
+
+
 private:
-    // Stores textures per obj_class + obj_subclass
     struct ObjectData {
         std::string obj_class;
         std::string obj_subclass;

@@ -7,7 +7,7 @@
 #include <SDL2/SDL_image.h>
 #include "engine/texture.h"
 #include "engine/tile/tilemap.h"
-#include "engine/obj/obj_load.h"  // Add objManager definition
+#include "engine/obj/obj_mgr.h"  // Add objManager definition
 
 class Engine {
 public:
