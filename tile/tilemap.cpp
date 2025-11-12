@@ -47,14 +47,7 @@ TileMap::TileMap(Engine* eng, const std::string& tilemapFile, int tileWidth, int
         }
 
         // Load texture from Tile_OBJ
-        Texture* tex = engine->loadTexture(tileObj->texture);
-        if (!tex) {
-            std::cerr << "Failed to load texture for tile: " << tileObj->texture << "\n";
-            continue;
-        }
-
-        // Construct the renderer Tile with the texture
-        tiles.emplace_back(tex, x, y, z);
+        engine->objMgr->instantiate("tile", obj_subclass, x, y, z);
     }
 }
 

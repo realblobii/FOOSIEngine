@@ -30,6 +30,7 @@ private:
         std::string obj_class;
         std::string obj_subclass;
         std::string texture;
+        int counter;
     };
 
     std::vector<ObjectData> objectDefs;

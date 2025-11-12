@@ -3,6 +3,8 @@
 #include <iostream>
 #include "game/objclass.h"
 
+int counter = 0;
+
 objManager::objManager(const std::string& objFile) {
     std::ifstream file(objFile);
     if (!file.is_open()) {
@@ -27,6 +29,7 @@ objManager::objManager(const std::string& objFile) {
         data.texture = t["textures"]["default"].asString();
         objectDefs.push_back(data);
     }
+    
 }
 
 std::unique_ptr<Object> objManager::obj_load(const std::string& obj_class, const std::string& obj_subclass) {
@@ -77,6 +80,8 @@ Object* objManager::instantiate(std::string obj_class, std::string obj_subclass,
     obj->x = x;
     obj->y = y;
     obj->z = z;
+    obj->id = counter;
+    counter++;
 
     // Store the object in the registry
     registry.push_back(std::move(obj));
