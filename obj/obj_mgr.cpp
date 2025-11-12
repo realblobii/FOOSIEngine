@@ -5,6 +5,37 @@
 
 int counter = 0;
 
+//----------------------------------
+// Object texture management
+//----------------------------------
+void Object::resolveTexture(const objManager& mgr) {
+    // find this object's texture from JSON based on texref
+    for (const auto& data : mgr.objectDefs) {
+        if (data.obj_class == obj_class && data.obj_subclass == obj_subclass) {
+            // JSON uses data.texture as the "default" texref,
+            // but you could extend this to handle more refs if needed.
+            if (texref == "default") {
+                texture = data.texture;
+            }
+            // later: else if (texref == "damaged") texture = data.textures["damaged"];
+            return;
+        }
+    }
+
+    std::cerr << "resolveTexture: failed to find texture for "
+              << obj_class << ":" << obj_subclass
+              << " texref=" << texref << "\n";
+}
+
+void Object::setTex(const std::string& newRef, const objManager& mgr) {
+    texref = newRef;
+    resolveTexture(mgr);
+}
+
+//----------------------------------
+// objManager
+//----------------------------------
+
 objManager::objManager(const std::string& objFile) {
     std::ifstream file(objFile);
     if (!file.is_open()) {
@@ -29,63 +60,45 @@ objManager::objManager(const std::string& objFile) {
         data.texture = t["textures"]["default"].asString();
         objectDefs.push_back(data);
     }
-    
 }
 
 std::unique_ptr<Object> objManager::obj_load(const std::string& obj_class, const std::string& obj_subclass) {
-    // 1. Create object using the factory
     auto obj = ObjectFactory::create(obj_class);
     if (!obj) return nullptr;
 
     obj->obj_class = obj_class;
     obj->obj_subclass = obj_subclass;
 
-    // 2. Look up texture from JSON definitions
-    auto it = std::find_if(objectDefs.begin(), objectDefs.end(),
-        [&](const ObjectData& data) {
-            return data.obj_class == obj_class && data.obj_subclass == obj_subclass;
-        });
+    // Initial texref assignment
+    obj->texref = "default";
 
-    if (it != objectDefs.end()) {
-        // Check if object has a 'texture' member
-        
-            obj->texture = it->texture;
-        
-        // For other object types, you could extend this with similar dynamic_cast checks
-    } else {
-        std::cerr << "Warning: subclass '" << obj_subclass << "' not found for class '" << obj_class << "'\n";
-    }
-
+    // Texture resolution now handled later by resolveTexture
     return obj;
 }
 
 void objManager::printRegistry() const {
     std::cout << "=== Object Registry ===\n";
-    for (const auto& obj : registry) {
+    for (const auto& obj : registry)
         if (obj) obj->describe();
-    }
     std::cout << "=======================\n";
 }
 
-
 Object* objManager::instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z) {
-    // Create the object (using your obj_load function)
     auto obj = obj_load(obj_class, obj_subclass);
     if (!obj) {
         std::cerr << "Failed to instantiate: " << obj_class << ":" << obj_subclass << "\n";
         return nullptr;
     }
 
-    // Set position
     obj->x = x;
     obj->y = y;
     obj->z = z;
-    obj->id = counter;
-    counter++;
+    obj->id = counter++;
+    obj->texref = "default";
 
-    // Store the object in the registry
+    // Resolve texture using current texref
+    obj->resolveTexture(*this);
+
     registry.push_back(std::move(obj));
-
-    // Return a raw pointer (for convenience)
     return registry.back().get();
 }

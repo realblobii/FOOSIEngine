@@ -15,22 +15,21 @@ public:
     objManager(const std::string& objFile);
 
     std::unique_ptr<Object> obj_load(const std::string& obj_class, const std::string& obj_subclass);
-
-    // Instantiates an object and stores it in the registry
     Object* instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z);
-
-    // Registry of active game objects
-    std::vector<std::unique_ptr<Object>> registry;
 
     void printRegistry() const;
 
+    // Registry of live objects
+    std::vector<std::unique_ptr<Object>> registry;
+
+    // Let Object access texture definitions
+    friend class Object;
 
 private:
     struct ObjectData {
         std::string obj_class;
         std::string obj_subclass;
-        std::string texture;
-        int counter;
+        std::string texture; // "default" texture (extend for multiple later)
     };
 
     std::vector<ObjectData> objectDefs;

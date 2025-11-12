@@ -5,19 +5,33 @@
 #include <memory>
 #include <iostream>
 
+class objManager; // forward declaration
+
 class Object {
 public:
     virtual ~Object() = default;
+
     std::string obj_class;
     std::string obj_subclass;
-    std::string texture;
+    std::string texref;   // texture reference, e.g. "default", "damaged"
+    std::string texture;  // actual texture path
 
-    int x,y,z,id;
+    int x, y, z, id;
 
+    // Describe for debug
     virtual void describe() const {
-        std::cout << "OBJECT ID " << id << " CLASS " << obj_class << ":" << obj_subclass << " TEXTURE " << texture << " COORDS " << x << " " << y << " " << z << std::endl;
-
+        std::cout << "OBJECT ID " << id
+                  << " CLASS " << obj_class << ":" << obj_subclass
+                  << " TEXREF " << texref
+                  << " TEXTURE " << texture
+                  << " COORDS (" << x << ", " << y << ", " << z << ")\n";
     }
+
+    // Called to update texture based on texref
+    virtual void resolveTexture(const objManager& mgr);
+
+    // Changes texref and updates texture accordingly
+    virtual void setTex(const std::string& newRef, const objManager& mgr);
 };
 
 #endif
