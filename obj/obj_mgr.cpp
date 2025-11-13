@@ -83,10 +83,14 @@ void objManager::printRegistry() const {
     std::cout << "=======================\n";
 }
 
-Object* objManager::instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z) {
+Object* objManager::instantiate(const std::string& obj_class,
+                                const std::string& obj_subclass,
+                                float x, float y, float z)
+{
     auto obj = obj_load(obj_class, obj_subclass);
     if (!obj) {
-        std::cerr << "Failed to instantiate: " << obj_class << ":" << obj_subclass << "\n";
+        std::cerr << "Failed to instantiate: " << obj_class
+                  << ":" << obj_subclass << "\n";
         return nullptr;
     }
 

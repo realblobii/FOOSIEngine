@@ -5,9 +5,17 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "engine/texture.h"
+#include "engine/render/texture.h"
 #include "engine/tile/tilemap.h"
-#include "engine/obj/obj_mgr.h"  // Add objManager definition
+#include "engine/obj/obj_mgr.h"  
+#include "game/main.h"
+#include <json/json.h>
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+
+// ✅ Forward declaration to avoid circular include
+class renderPipeline;
 
 class Engine {
 public:
@@ -19,24 +27,25 @@ public:
     void update();
     void render();
     void clean();
+    
     Texture* loadTexture(const std::string& filename, int x = 0, int y = 0,
-                     int width = 0, int height = 0);
+                         int width = 0, int height = 0);
 
-    bool running(){return isRunning;}
+    bool running() { return isRunning; }
     SDL_Renderer* getRenderer() { return renderer; }
 
-    TileMap* tileMap = nullptr;      // pointer to current TileMap
-    objManager* objMgr = nullptr; // pointer to object manager
+    TileMap* tileMap = nullptr;     
+    objManager* objMgr = nullptr; 
+    renderPipeline* rPipeline = nullptr; // ✅ pointer type is fine with forward declare
 
-    // Optional: helper to set TileMap from JSON file
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
 
 private:
-    bool isRunning;
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    bool isRunning = false;
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
     std::vector<Texture*> textures; 
-  
+    std::unordered_map<std::string, Texture*> textureCache; // cache of textures
 };
 
 #endif // ENGINEM_H

@@ -16,7 +16,10 @@ public:
     std::string texref;   // texture reference, e.g. "default", "damaged"
     std::string texture;  // actual texture path
 
-    int x, y, z, id;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    int id = 0;
 
     // Describe for debug
     virtual void describe() const {

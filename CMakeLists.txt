@@ -4,8 +4,8 @@ project(Engine)
 # Build the engine as a static library
 add_library(engine STATIC
     enginem.cpp
-    texture.cpp
-    tile/tile.cpp
+    render/texture.cpp
+    render/renderm.cpp
     tile/tilemap.cpp
     obj/obj_mgr.cpp
 )

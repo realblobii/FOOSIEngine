@@ -15,7 +15,9 @@ public:
     objManager(const std::string& objFile);
 
     std::unique_ptr<Object> obj_load(const std::string& obj_class, const std::string& obj_subclass);
-    Object* instantiate(std::string obj_class, std::string obj_subclass, int x, int y, int z);
+    Object* instantiate(const std::string& obj_class,
+                                const std::string& obj_subclass,
+                                float x, float y, float z);
 
     void printRegistry() const;
 

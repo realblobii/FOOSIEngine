@@ -1,9 +1,5 @@
 #include "engine/enginem.h"
-#include "game/main.h"
-#include "engine/tile/tilemap.h"
-#include <json/json.h>
-#include <iostream>
-#include <fstream>
+#include "engine/render/renderm.h"  
 
 
 Engine::Engine() {}
@@ -37,6 +33,9 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         if (!objMgr) {
     this->objMgr = new objManager("assets/objects.json");
 }
+if (!rPipeline){
+    this->rPipeline = new renderPipeline(this);
+}
 
 
     } else {
@@ -64,13 +63,7 @@ void Engine::render() {
     SDL_RenderClear(renderer);
 
     // Render TileMap if it exists
-    if (tileMap) {
-        // Center the grid horizontally and give a top margin
-        int screenWidth  = 800;  // or store in Engine if dynamic
-        int topMargin    = 50;
-        tileMap->render(screenWidth / 2, topMargin);
-    }
-
+    rPipeline->renderAll();
     // Render individual textures
     for (auto tex : textures)
         tex->render();
@@ -80,27 +73,31 @@ void Engine::render() {
 
 
 Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
-    Texture* tex = new Texture(renderer);
+    // 1. Check cache first
+    auto it = textureCache.find(filename);
+    if (it != textureCache.end()) {
+        Texture* tex = it->second;
+        tex->setTransform(x, y);
+        return tex; // reuse cached texture
+    }
 
+    // 2. Not found, load new texture
+    Texture* tex = new Texture(renderer);
     if (!tex->loadFromFile(filename)) {
         std::cerr << "Failed to load texture: '" << filename << "'\n";
         delete tex;
-        return nullptr; // engine handles error, game doesn’t need to check
+        return nullptr;
     }
 
-    // Set transform with optional scaling
     tex->setTransform(x, y);
-
-    // If width and height are specified, override the texture’s natural size
-    if (width > 0 && height > 0) {
-        SDL_Rect* clip = new SDL_Rect{0, 0, width, height};
-        tex->setTransform(x, y, 0.0, nullptr, clip);
-        // note: engine is now responsible for deleting this cliprect in clean()
-    }
+    if (width > 0 && height > 0)
+        tex->setTransform(x, y, 0.0, nullptr, new SDL_Rect{0, 0, width, height});
 
     textures.push_back(tex);
+    textureCache[filename] = tex; // store in cache
     return tex;
 }
+
 void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight) {
     if (tileMap) {
         delete tileMap;
@@ -110,10 +107,11 @@ void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHei
 
 
 void Engine::clean() {
-    for (auto tex : textures) {
-        delete tex;
-    }
+    for (auto& tex : textures)
+    delete tex;
     textures.clear();
+    textureCache.clear();
+
 
     if (tileMap) {
         delete tileMap;
@@ -123,6 +121,10 @@ void Engine::clean() {
     if (objMgr) {
         delete objMgr;
         objMgr = nullptr;
+    }
+    if(rPipeline){
+        delete rPipeline;
+        rPipeline = nullptr;
     }
 
     SDL_DestroyRenderer(renderer);
