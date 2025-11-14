@@ -14,9 +14,6 @@
 #include <fstream>
 #include <unordered_map>
 
-// ✅ Forward declaration to avoid circular include
-class renderPipeline;
-
 class Engine {
 public:
     Engine();
