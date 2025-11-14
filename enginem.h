@@ -14,6 +14,8 @@
 #include <fstream>
 #include <unordered_map>
 
+class renderPipeline;
+
 class Engine {
 public:
     Engine();
@@ -24,6 +26,7 @@ public:
     void update();
     void render();
     void clean();
+    void printFPS();
     
     Texture* loadTexture(const std::string& filename, int x = 0, int y = 0,
                          int width = 0, int height = 0);
@@ -43,6 +46,8 @@ private:
     SDL_Renderer* renderer = nullptr;
     std::vector<Texture*> textures; 
     std::unordered_map<std::string, Texture*> textureCache; // cache of textures
+    Uint32 fpsLastTime = 0;  // Last time we updated FPS
+    int fpsFrames = 0;        // Frames counted since last FPS update
 };
 
 #endif // ENGINEM_H

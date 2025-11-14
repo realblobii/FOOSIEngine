@@ -58,6 +58,9 @@ void Engine::handleEvents() {
 }
 void Engine::update() {
     Update();
+    for (auto& obj : objMgr->registry){
+        obj->Update();
+    }
 }
 void Engine::render() {
     SDL_RenderClear(renderer);
@@ -103,6 +106,19 @@ void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHei
         delete tileMap;
     }
     tileMap = new TileMap(this, jsonFile, tileWidth, tileHeight);
+}
+
+
+void Engine::printFPS() {
+    fpsFrames++;
+    Uint32 currentTime = SDL_GetTicks(); // milliseconds since SDL init
+
+    if (currentTime - fpsLastTime >= 1000) { // 1 second elapsed
+        int fps = fpsFrames;
+        std::cout << "FPS: " << fps << std::endl;
+        fpsFrames = 0;
+        fpsLastTime = currentTime;
+    }
 }
 
 

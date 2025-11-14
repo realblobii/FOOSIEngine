@@ -28,17 +28,17 @@ void renderPipeline::renderAll() {
         });
 
     // 3. Render all objects
-    const int TILE_WIDTH  = 32;
-    const int TILE_HEIGHT = 32;
-    const int OFFSET_X = 100; // optional screen offset
-    const int OFFSET_Y = 100;
+    const int TILE_WIDTH  = 64;
+    const int TILE_HEIGHT = 64;
+    const int OFFSET_X = 400; // optional screen offset
+    const int OFFSET_Y = -150;
 
     for (const auto* obj : sortedObjects) {
         if (!obj) continue;
 
         // Convert float XYZ → screen coordinates
         float screenXf = (obj->x - obj->y) * (TILE_WIDTH / 2.0f) + OFFSET_X;
-        float screenYf = (obj->x + obj->y) * (5) - (obj->z * (21)) + OFFSET_Y;
+        float screenYf = (obj->x + obj->y) * (10) - (obj->z * (42)) + OFFSET_Y;
 
         // Cast to int for SDL rendering
         int screenX = static_cast<int>(screenXf);
