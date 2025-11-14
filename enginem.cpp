@@ -72,6 +72,7 @@ void Engine::render() {
         tex->render();
 
     SDL_RenderPresent(renderer);
+    printFPS();
 }
 
 

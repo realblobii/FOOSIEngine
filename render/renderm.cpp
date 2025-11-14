@@ -30,8 +30,8 @@ void renderPipeline::renderAll() {
     // 3. Render all objects
     const int TILE_WIDTH  = 64;
     const int TILE_HEIGHT = 64;
-    const int OFFSET_X = 400; // optional screen offset
-    const int OFFSET_Y = -150;
+    const int OFFSET_X = 0; // optional screen offset
+    const int OFFSET_Y = 0;
 
     for (const auto* obj : sortedObjects) {
         if (!obj) continue;
