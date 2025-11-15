@@ -5,6 +5,12 @@
 Engine::Engine() {}
 Engine::~Engine() {}
 
+const int TARGET_FPS = 60;
+const float TARGET_FRAME_TIME = 1000.0f / TARGET_FPS; // in milliseconds
+Uint32 currentTime;
+
+Uint32 lastTime = SDL_GetTicks();
+
 void Engine::Init(const char* title, int w, int h, bool fullscreen) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN;
@@ -16,7 +22,7 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
             std::cout << "Window Creation Success!" << std::endl;
         }
 
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         if (renderer) {
             SDL_SetRenderDrawColor(renderer,255,255,255,255);
             std::cout << "Renderer Creation Success!" << std::endl;
@@ -27,7 +33,8 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
             std::cout << "IMG Init Success!" << std::endl;
         }
 
-        isRunning = true;
+        sdl_sx = w;
+        sdl_sy = h;
 
         // --- Initialize object manager here ---
         if (!objMgr) {
@@ -42,37 +49,43 @@ if (!rPipeline){
         std::cerr << "SDL Initialization Failed: " << SDL_GetError() << std::endl;
         isRunning = false;
     }
+    isRunning = true;
 }
 
 
 void Engine::handleEvents() {
     SDL_Event event;
-    SDL_PollEvent(&event);
+while (SDL_PollEvent(&event)) {
     switch (event.type){
         case SDL_QUIT:
-        isRunning = false;
-        break;
-        default:
-        break;
+            isRunning = false;
+            break;
     }
 }
-void Engine::update() {
-    Update();
+}
+void Engine::update(float deltaTime) {
     for (auto& obj : objMgr->registry){
-        obj->Update();
+        obj->Update(deltaTime);
     }
 }
+void Engine::getDeltaT(){
+    currentTime = SDL_GetTicks();
+    deltaTime = (currentTime - lastTime) / 1000.0f; // seconds
+    lastTime = currentTime;
+}
+
 void Engine::render() {
     SDL_RenderClear(renderer);
 
-    // Render TileMap if it exists
     rPipeline->renderAll();
-    // Render individual textures
-    for (auto tex : textures)
-        tex->render();
 
     SDL_RenderPresent(renderer);
-    printFPS();
+
+    Uint32 frameTime = SDL_GetTicks() - currentTime;
+    if (frameTime < TARGET_FRAME_TIME)
+    {
+      SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frameTime));
+    }
 }
 
 
@@ -94,8 +107,10 @@ Texture* Engine::loadTexture(const std::string& filename, int x, int y, int widt
     }
 
     tex->setTransform(x, y);
-    if (width > 0 && height > 0)
-        tex->setTransform(x, y, 0.0, nullptr, new SDL_Rect{0, 0, width, height});
+    if (width > 0 && height > 0){
+        SDL_Rect src = {0,0,width,height};
+    tex->setTransform(x, y, 0.0, nullptr, &src);
+    }
 
     textures.push_back(tex);
     textureCache[filename] = tex; // store in cache

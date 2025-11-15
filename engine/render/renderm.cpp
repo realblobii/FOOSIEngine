@@ -30,8 +30,8 @@ void renderPipeline::renderAll() {
     // 3. Render all objects
     const int TILE_WIDTH  = 64;
     const int TILE_HEIGHT = 64;
-    const int OFFSET_X = 0; // optional screen offset
-    const int OFFSET_Y = 0;
+    const int OFFSET_X = engine->sdl_sx/2; // optional screen offset
+    const int OFFSET_Y = engine->sdl_sy/2;
 
     for (const auto* obj : sortedObjects) {
         if (!obj) continue;

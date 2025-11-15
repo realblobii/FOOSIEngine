@@ -23,10 +23,11 @@ public:
 
     void Init(const char* title, int w, int h, bool fullscreen);
     void handleEvents();
-    void update();
+    void update(float deltaTime);
     void render();
     void clean();
     void printFPS();
+    void getDeltaT();
     
     Texture* loadTexture(const std::string& filename, int x = 0, int y = 0,
                          int width = 0, int height = 0);
@@ -39,6 +40,10 @@ public:
     renderPipeline* rPipeline = nullptr; // ✅ pointer type is fine with forward declare
 
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
+    
+    int sdl_sx, sdl_sy;
+
+    float deltaTime;
 
 private:
     bool isRunning = false;

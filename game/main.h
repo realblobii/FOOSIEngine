@@ -2,5 +2,5 @@
 #define MAIN_H
 #include "engine/enginem.h"
 
-void Update();
+void Update(float deltaTime);
 #endif

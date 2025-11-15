@@ -55,4 +55,4 @@ CMakeUserPresets.json
 
 
 # --- FOOSIE SPECIFIC IGNORES ---
-./game/assets/*
+./game/assets/

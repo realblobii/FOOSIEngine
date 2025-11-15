@@ -15,7 +15,12 @@ target_include_directories(game
 )
 
 # Step 4: Link engine library
-target_link_libraries(game PRIVATE engine)
+target_link_libraries(game
+    PRIVATE
+        engine
+        jsoncpp
+)
+
 
 # Step 5: Put the binary in game/build/
 set_target_properties(game PROPERTIES
