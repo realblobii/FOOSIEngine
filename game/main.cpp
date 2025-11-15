@@ -6,15 +6,16 @@ Engine *engine = nullptr;
 int main(int argc, const char *argv[])
 {
   engine = new Engine{};
-  engine->Init("New Game", 1920, 1080, true);\
-  engine->loadTileMap("assets/tiles.json",64,64);
+  engine->Init("New Game", 1920, 1080, true);
 
-  while (engine->running()) {
+  while (engine->running())
+  {
+    
+    engine->getDeltaT();
     engine->handleEvents();
-    engine->update();   // no deltaTime
+    engine->update(engine->deltaTime);
     engine->render();
-}
-
+  }
 
   engine->clean();
 }

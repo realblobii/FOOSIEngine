@@ -36,7 +36,7 @@ public:
     // Changes texref and updates texture accordingly
     virtual void setTex(const std::string& newRef, const objManager& mgr);
 
-    virtual void Update(){}
+    virtual void Update(float deltaTime){}
 };
 
 #endif

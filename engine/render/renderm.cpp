@@ -1,6 +1,4 @@
 #include "engine/render/renderm.h"
-#include "engine/enginem.h" // full definition of Engine
-
 #include <algorithm>
 #include <iostream>
 
@@ -8,21 +6,20 @@ renderPipeline::renderPipeline(Engine* eng)
     : engine(eng), registry(&eng->objMgr->registry)
 {
 }
-bool warnedEmpty = false;
+
 void renderPipeline::renderAll() {
     if (!registry || registry->empty()) {
-        if (!warnedEmpty) {
-            std::cerr << "[renderPipeline] Warning: registry is empty or null\n";
-            warnedEmpty = true;
-        }
+        std::cerr << "[renderPipeline] Warning: registry is empty or null\n";
         return;
     }
 
+    // 1. Copy non-null object pointers
     std::vector<Object*> sortedObjects;
     sortedObjects.reserve(registry->size());
     for (const auto& obj : *registry)
         if (obj) sortedObjects.push_back(obj.get());
 
+    // 2. Sort by Z → Y → X (isometric painter’s order)
     std::sort(sortedObjects.begin(), sortedObjects.end(),
         [](const Object* a, const Object* b) {
             if (a->z != b->z) return a->z < b->z;
@@ -30,27 +27,36 @@ void renderPipeline::renderAll() {
             return a->x < b->x;
         });
 
+    // 3. Render all objects
     const int TILE_WIDTH  = 64;
     const int TILE_HEIGHT = 64;
-    const float OFFSET_X = engine->sdl_sx / 2.0f;
-    const float OFFSET_Y = engine->sdl_sy / 2.0f;
+    const int OFFSET_X = engine->sdl_sx/2; // optional screen offset
+    const int OFFSET_Y = engine->sdl_sy/2;
 
     for (const auto* obj : sortedObjects) {
         if (!obj) continue;
 
+        // Convert float XYZ → screen coordinates
         float screenXf = (obj->x - obj->y) * (TILE_WIDTH / 2.0f) + OFFSET_X;
-        float screenYf = (obj->x + obj->y) * 10.0f - (obj->z * 42.0f) + OFFSET_Y;
+        float screenYf = (obj->x + obj->y) * (10) - (obj->z * (42)) + OFFSET_Y;
 
+        // Cast to int for SDL rendering
         int screenX = static_cast<int>(screenXf);
         int screenY = static_cast<int>(screenYf);
 
-        // now engine is fully known, this works
+        // Load + render texture (cached)
         Texture* tex = engine->loadTexture(obj->texture, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
         if (!tex) {
-            std::cerr << "[renderPipeline] Failed to load texture: " << obj->texture << "\n";
+            std::cerr << "[renderPipeline] Failed to load texture: "
+                      << obj->texture << "\n";
             continue;
         }
 
         tex->render();
+
+        // Optional debug output
+        // std::cout << "Rendered " << obj->obj_class << ":" << obj->obj_subclass
+        //           << " at iso(" << obj->x << "," << obj->y << "," << obj->z << ")"
+        //           << " → screen(" << screenX << "," << screenY << ")\n";
     }
 }

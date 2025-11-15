@@ -1,38 +1,44 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
-#include <string>
 #include <SDL2/SDL.h>
-#include <GL/gl.h>
-#include <iostream>
+#include <SDL2/SDL_image.h>
+#include <string>
 
 class Texture {
 public:
-    Texture();
+    // Constructor: takes an SDL_Renderer pointer
+    explicit Texture(SDL_Renderer* renderer);
+
+    // Destructor: automatically frees texture
     ~Texture();
 
-    // Load a texture from file using SDL_image and convert to OpenGL texture
+    // Load an image from file
     bool loadFromFile(const std::string& filename);
 
-    // Set position, size (angle, flip are ignored for now)
-    void setTransform(float x, float y, float width = 32.0f, float height = 32.0f);
+    // Set position, rotation, and other transform data
+    void setTransform(int x, int y, double angle = 0.0,
+                      SDL_Point* center = nullptr,
+                      SDL_Rect* cliprect = nullptr,
+                      SDL_RendererFlip fliptype = SDL_FLIP_NONE);
 
-    // Render the texture
-    void render() const;
+    // Render texture (optionally override x/y/clip)
+    void render(int x = -1, int y = -1, SDL_Rect* clip = nullptr) const;
 
-    // Free OpenGL texture
+    // Free the SDL texture
     void free();
 
     // Accessors
-    float getX() const { return x; }
-    float getY() const { return y; }
-    float getWidth() const { return width; }
-    float getHeight() const { return height; }
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
 
 private:
-    GLuint texID;      // OpenGL texture ID
-    float x, y;        // Screen position
-    float width, height; // Size
-};
+    SDL_Renderer* renderer;
+    SDL_Texture* texture;
 
-#endif
+    int width, height;
+    int x, y;
+    double angle;
+    SDL_Point* center;
+    SDL_Rect* cliprect;
+    SDL_RendererFlip fliptype;
+};
