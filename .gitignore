@@ -52,3 +52,7 @@ CMakeUserPresets.json
 
 # debug information files
 *.dwo
+
+
+# --- FOOSIE SPECIFIC IGNORES ---
+./game/assets/*

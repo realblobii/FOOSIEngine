@@ -7,7 +7,7 @@ Engine::~Engine() {}
 
 void Engine::Init(const char* title, int w, int h, bool fullscreen) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-        int flags = fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_SHOWN;
+        int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN;
 
         std::cout << "SDL Successfully Initialised!" << std::endl;
 
