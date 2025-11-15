@@ -3,56 +3,68 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "engine/render/texture.h"
-#include "engine/tile/tilemap.h"
-#include "engine/obj/obj_mgr.h"  
-#include "game/main.h"
-#include <json/json.h>
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
+#include <GL/gl.h>
 
-class renderPipeline;
+#include "engine/render/texture.h"
+#include "engine/render/renderm.h"
+#include "engine/tile/tilemap.h"
+#include "engine/obj/obj_mgr.h"
 
 class Engine {
 public:
     Engine();
     ~Engine();
 
-    void Init(const char* title, int w, int h, bool fullscreen);
+    // Initialization
+    void Init(const char* title, int width, int height, bool fullscreen);
+
+    // Main loop
     void handleEvents();
-    void update(float deltaTime);
+    void update();
     void render();
-    void clean();
-    void printFPS();
-    void getDeltaT();
-    
-    Texture* loadTexture(const std::string& filename, int x = 0, int y = 0,
+
+    // Texture management
+    Texture* loadTexture(const std::string& filename,
+                         int x = 0, int y = 0,
                          int width = 0, int height = 0);
 
-    bool running() { return isRunning; }
-    SDL_Renderer* getRenderer() { return renderer; }
-
-    TileMap* tileMap = nullptr;     
-    objManager* objMgr = nullptr; 
-    renderPipeline* rPipeline = nullptr; // ✅ pointer type is fine with forward declare
-
+    // Tilemap
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
-    
-    int sdl_sx, sdl_sy;
 
-    float deltaTime;
+    // FPS
+    void printFPS();
+
+    // Cleanup
+    void clean();
+
+    // State
+    bool running() const { return isRunning; }
+
+    // Screen size
+    int sdl_sx = 0;
+    int sdl_sy = 0;
+
+    // Delta time (seconds)
+
+    // Public members
+    TileMap* tileMap = nullptr;
+    objManager* objMgr = nullptr;
+    renderPipeline* rPipeline = nullptr;
 
 private:
     bool isRunning = false;
+
     SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-    std::vector<Texture*> textures; 
-    std::unordered_map<std::string, Texture*> textureCache; // cache of textures
-    Uint32 fpsLastTime = 0;  // Last time we updated FPS
-    int fpsFrames = 0;        // Frames counted since last FPS update
+    SDL_Renderer* renderer = nullptr; // only needed for legacy Texture load
+    SDL_GLContext glContext = nullptr;
+
+    std::vector<Texture*> textures;
+    std::unordered_map<std::string, Texture*> textureCache;
+
+    
 };
 
 #endif // ENGINEM_H

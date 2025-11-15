@@ -1,17 +1,8 @@
 #include "engine/render/texture.h"
-#include <iostream>
+#include <SDL2/SDL_image.h>
 
-Texture::Texture(SDL_Renderer* renderer)
-    : renderer(renderer),
-      texture(nullptr),
-      width(0),
-      height(0),
-      x(0),
-      y(0),
-      angle(0.0),
-      center(nullptr),
-      cliprect(nullptr),
-      fliptype(SDL_FLIP_NONE)
+Texture::Texture()
+    : texID(0), x(0), y(0), width(32), height(32)
 {}
 
 Texture::~Texture() {
@@ -19,7 +10,7 @@ Texture::~Texture() {
 }
 
 bool Texture::loadFromFile(const std::string& filename) {
-    free(); // Free existing texture if loaded
+    free(); // free previous texture
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (!surface) {
@@ -28,56 +19,55 @@ bool Texture::loadFromFile(const std::string& filename) {
         return false;
     }
 
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (!texture) {
-        std::cerr << "Texture error: Could not create texture from "
-                  << filename << " | SDL Error: " << SDL_GetError() << std::endl;
-        SDL_FreeSurface(surface);
-        return false;
-    }
+    // Generate OpenGL texture
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_2D, texID);
 
-    width = surface->w;
-    height = surface->h;
+    GLenum format = GL_RGBA;
+    if (surface->format->BytesPerPixel == 3) format = GL_RGB;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, surface->w, surface->h, 0,
+                 format, GL_UNSIGNED_BYTE, surface->pixels);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    width = static_cast<float>(surface->w);
+    height = static_cast<float>(surface->h);
+
     SDL_FreeSurface(surface);
     return true;
 }
 
-void Texture::setTransform(int x, int y, double angle,
-                           SDL_Point* center,
-                           SDL_Rect* cliprect,
-                           SDL_RendererFlip fliptype) {
+void Texture::setTransform(float x, float y, float w, float h) {
     this->x = x;
     this->y = y;
-    this->angle = angle;
-    this->center = center;
-    this->cliprect = cliprect;
-    this->fliptype = fliptype;
+    this->width = w;
+    this->height = h;
 }
 
-void Texture::render(int x, int y, SDL_Rect* clip) const {
-    if (!texture) {
-        std::cerr << "Warning: Tried to render a null texture!" << std::endl;
-        return;
-    }
+void Texture::render() const {
+    if (!texID) return;
 
-    SDL_Rect dstRect = { (x >= 0 ? x : this->x),
-                         (y >= 0 ? y : this->y),
-                         width, height };
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texID);
 
-    const SDL_Rect* srcRect = clip ? clip : cliprect;
-    if (srcRect) {
-        dstRect.w = srcRect->w;
-        dstRect.h = srcRect->h;
-    }
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(x + width, y);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(x + width, y + height);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + height);
+    glEnd();
 
-    SDL_RenderCopyEx(renderer, texture, srcRect, &dstRect,
-                     angle, center, fliptype);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
 }
 
 void Texture::free() {
-    if (texture) {
-        SDL_DestroyTexture(texture);
-        texture = nullptr;
-        width = height = 0;
+    if (texID != 0) {
+        glDeleteTextures(1, &texID);
+        texID = 0;
     }
 }

@@ -4,7 +4,10 @@
 #include <vector>
 #include <memory>
 #include "engine/obj/obj.h"
-#include "engine/enginem.h"
+#include "engine/render/texture.h"
+
+// Forward declaration to avoid circular dependency
+class Engine;
 
 class renderPipeline {
 public:
