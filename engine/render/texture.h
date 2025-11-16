@@ -12,19 +12,10 @@ public:
     // Destructor: automatically frees texture
     ~Texture();
 
-    // Load an image from file
+    // Basic Texture mgmt Functions
     bool loadFromFile(const std::string& filename);
-
-    // Set position, rotation, and other transform data
-    void setTransform(int x, int y, double angle = 0.0,
-                      SDL_Point* center = nullptr,
-                      SDL_Rect* cliprect = nullptr,
-                      SDL_RendererFlip fliptype = SDL_FLIP_NONE);
-
-    // Render texture (optionally override x/y/clip)
+    void setTransform(int x, int y, double angle = 0.0, SDL_Point* center = nullptr, SDL_Rect* cliprect = nullptr, SDL_RendererFlip fliptype = SDL_FLIP_NONE);
     void render(int x = -1, int y = -1, SDL_Rect* clip = nullptr) const;
-
-    // Free the SDL texture
     void free();
 
     // Accessors

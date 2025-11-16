@@ -30,7 +30,7 @@ void renderPipeline::renderAll() {
     // 3. Render all objects
     const int TILE_WIDTH  = 64;
     const int TILE_HEIGHT = 64;
-    const int OFFSET_X = engine->sdl_sx/2; // optional screen offset
+    const int OFFSET_X = engine->sdl_sx/2; 
     const int OFFSET_Y = engine->sdl_sy/2;
 
     for (const auto* obj : sortedObjects) {
@@ -53,10 +53,5 @@ void renderPipeline::renderAll() {
         }
 
         tex->render();
-
-        // Optional debug output
-        // std::cout << "Rendered " << obj->obj_class << ":" << obj->obj_subclass
-        //           << " at iso(" << obj->x << "," << obj->y << "," << obj->z << ")"
-        //           << " → screen(" << screenX << "," << screenY << ")\n";
     }
 }

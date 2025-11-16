@@ -12,8 +12,8 @@ public:
     void renderAll();
 
 private:
-    Engine* engine = nullptr; // pointer to parent engine
-    std::vector<std::unique_ptr<Object>>* registry = nullptr; // points to objMgr registry
+    Engine* engine = nullptr; 
+    std::vector<std::unique_ptr<Object>>* registry = nullptr; 
 };
 
-#endif // RENDERM_H
+#endif 

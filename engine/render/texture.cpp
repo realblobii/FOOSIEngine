@@ -19,7 +19,7 @@ Texture::~Texture() {
 }
 
 bool Texture::loadFromFile(const std::string& filename) {
-    free(); // Free existing texture if loaded
+    free(); 
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (!surface) {

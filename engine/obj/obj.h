@@ -30,12 +30,9 @@ public:
                   << " COORDS (" << x << ", " << y << ", " << z << ")\n";
     }
 
-    // Called to update texture based on texref
+    
     virtual void resolveTexture(const objManager& mgr);
-
-    // Changes texref and updates texture accordingly
     virtual void setTex(const std::string& newRef, const objManager& mgr);
-
     virtual void Update(float deltaTime){}
 };
 
