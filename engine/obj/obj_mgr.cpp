@@ -17,7 +17,7 @@ void Object::resolveTexture(const objManager& mgr) {
             if (texref == "default") {
                 texture = data.texture;
             }
-            // later: else if (texref == "damaged") texture = data.textures["damaged"];
+            
             return;
         }
     }
@@ -69,10 +69,6 @@ std::unique_ptr<Object> objManager::obj_load(const std::string& obj_class, const
     obj->obj_class = obj_class;
     obj->obj_subclass = obj_subclass;
 
-    // Initial texref assignment
-    obj->texref = "default";
-
-    // Texture resolution now handled later by resolveTexture
     return obj;
 }
 

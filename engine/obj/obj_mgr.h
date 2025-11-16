@@ -23,15 +23,14 @@ public:
 
     // Registry of live objects
     std::vector<std::unique_ptr<Object>> registry;
-
-    // Let Object access texture definitions
+    
     friend class Object;
 
 private:
     struct ObjectData {
         std::string obj_class;
         std::string obj_subclass;
-        std::string texture; // "default" texture (extend for multiple later)
+        std::string texture;
     };
 
     std::vector<ObjectData> objectDefs;

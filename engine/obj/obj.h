@@ -13,8 +13,8 @@ public:
 
     std::string obj_class;
     std::string obj_subclass;
-    std::string texref;   // texture reference, e.g. "default", "damaged"
-    std::string texture;  // actual texture path
+    std::string texref = "default";   
+    std::string texture; 
 
     float x = 0.0f;
     float y = 0.0f;

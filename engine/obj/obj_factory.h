@@ -14,7 +14,7 @@ class ObjectFactory {
 public:
     using Creator = std::function<std::unique_ptr<Object>()>;
 
-    // Register a class with a name
+    // Registers class with the OBJ Class system
     static void registerClass(const std::string& name, Creator creator) {
         getRegistry()[name] = std::move(creator);
     }
@@ -35,21 +35,5 @@ private:
         return registry;
     }
 };
-
-// -----------------------------
-// Portable registration macro
-// Use AFTER full class definition
-// Works with string literals
-#define REGISTER_OBJECT_TYPE(TYPE, NAME_STR)                   \
-namespace {                                                     \
-    struct TYPE##_Registrar {                                   \
-        TYPE##_Registrar() {                                    \
-            ObjectFactory::registerClass(NAME_STR, []() {      \
-                return std::make_unique<TYPE>();               \
-            });                                                \
-        }                                                       \
-    };                                                          \
-    static TYPE##_Registrar global_##TYPE##_registrar;         \
-}
 
 #endif // OBJ_FACTORY_H
