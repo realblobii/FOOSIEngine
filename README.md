@@ -1,5 +1,5 @@
 # FOOSIE
-Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FOSS) isometric game engine in C++ using SDL's built-in renderer licensed under the GNU LGPL v3.0 or later. 
+Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FOSS) isometric game engine in C++ using SDL's input/window libraries with the OpenGL renderer, licensed under the GNU LGPL v3.0 or later. 
 
 ## Installation
 So far I have only install instructions for Arch Linux, so try to translate into installing these on your own distro. 
