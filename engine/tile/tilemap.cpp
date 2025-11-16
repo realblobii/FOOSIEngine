@@ -1,11 +1,11 @@
 #include "engine/tile/tilemap.h"
 #include "engine/obj/obj.h"
 #include "engine/tile/tile_oclass.h"
-#include "engine/enginem.h"   // full Engine definition needed
+#include "engine/enginem.h"  
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
-#include <algorithm>  // for std::sort
+#include <algorithm>  
 
 TileMap::TileMap(Engine* eng, const std::string& tilemapFile, int tileWidth, int tileHeight)
     : engine(eng), tileWidth(tileWidth), tileHeight(tileHeight)
@@ -32,7 +32,7 @@ TileMap::TileMap(Engine* eng, const std::string& tilemapFile, int tileWidth, int
         int y = t["y"].asInt();
         int z = t["z"].asInt();
 
-        // Always assume class is "tile"
+        // Always assume class is "tile" because otherwise tilemap wont work. 
         auto obj = engine->objMgr->obj_load("tile", obj_subclass);
         if (!obj) {
             std::cerr << "Failed to load object for subclass: " << obj_subclass << "\n";

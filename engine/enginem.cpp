@@ -6,7 +6,7 @@ Engine::Engine() {}
 Engine::~Engine() {}
 
 const int TARGET_FPS = 60;
-const float TARGET_FRAME_TIME = 1000.0f / TARGET_FPS; // in milliseconds
+const float TARGET_FRAME_TIME = 1000.0f / TARGET_FPS; 
 Uint32 currentTime;
 
 Uint32 lastTime = SDL_GetTicks();
@@ -36,13 +36,9 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         sdl_sx = w;
         sdl_sy = h;
 
-        // --- Initialize object manager here ---
-        if (!objMgr) {
-    this->objMgr = new objManager("assets/objects.json");
-}
-if (!rPipeline){
-    this->rPipeline = new renderPipeline(this);
-}
+        
+        if (!objMgr) {this->objMgr = new objManager("assets/objects.json");}
+        if (!rPipeline){this->rPipeline = new renderPipeline(this);}
 
 
     } else {
@@ -88,7 +84,6 @@ void Engine::render() {
     }
 }
 
-
 Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
     // 1. Check cache first
     auto it = textureCache.find(filename);
@@ -127,9 +122,9 @@ void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHei
 
 void Engine::printFPS() {
     fpsFrames++;
-    Uint32 currentTime = SDL_GetTicks(); // milliseconds since SDL init
+    Uint32 currentTime = SDL_GetTicks(); 
 
-    if (currentTime - fpsLastTime >= 1000) { // 1 second elapsed
+    if (currentTime - fpsLastTime >= 1000) { 
         int fps = fpsFrames;
         std::cout << "FPS: " << fps << std::endl;
         fpsFrames = 0;

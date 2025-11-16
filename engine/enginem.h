@@ -37,7 +37,7 @@ public:
 
     TileMap* tileMap = nullptr;     
     objManager* objMgr = nullptr; 
-    renderPipeline* rPipeline = nullptr; // ✅ pointer type is fine with forward declare
+    renderPipeline* rPipeline = nullptr; 
 
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
     
@@ -50,7 +50,7 @@ private:
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     std::vector<Texture*> textures; 
-    std::unordered_map<std::string, Texture*> textureCache; // cache of textures
+    std::unordered_map<std::string, Texture*> textureCache; 
     Uint32 fpsLastTime = 0;  // Last time we updated FPS
     int fpsFrames = 0;        // Frames counted since last FPS update
 };
