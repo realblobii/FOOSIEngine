@@ -30,10 +30,10 @@ Subclasses for the most part aren't meant to define their own code, however, if 
 Generally, object classes are created in a JSON file, and defined in a header/CPP file. The JSON file mainly initiates the objects and gives things like textures or variables to sub-classes, whereas the C++ will ensure the main class will work in the engine. If you don't have a class in both JSON and C++, the Object Loader will tend to fail. We plan to automate this in future versions via commandline TUI, or a bespoke GUI.
 
 ## The Registry
-FOOSIE uses a system called the object registry. Rather than having a child-parent system, each object within FOOSIE is equal. If you wish for one object to follow another, you can `ObjManager::tether()` to it \[WIP]. 
+FOOSIE uses a system called the object registry. Rather than having a child-parent system, each object within FOOSIE is equal. If you wish for one object to follow another, you can `objManager::tether()` to it \[WIP]. 
 
 ### Accessing the Registry
-The Registry is a child vector of the `ObjManager` class andsoforth can be accessed via `engine->objMgr`. If you wish to sort the registry or move it around in any other way than adding or removing objects from the world, it is advised to create a copy with it instead of using a direct pointer to avoid upsetting object logic. Nobody wants a world that won't render. 
+The Registry is a child vector of the `objManager` class andsoforth can be accessed via `engine->objMgr`. If you wish to sort the registry or move it around in any other way than adding or removing objects from the world, it is advised to create a copy with it instead of using a direct pointer to avoid upsetting object logic. Nobody wants a world that won't render. 
 
 ### Adding/Removing objects
 So far, adding objects is as easy as `objManager::instantiate()` for your object! Though, I would recommend using Tilemaps for `tile` objects. Again, this will be updated when I add a simple registry object destroyer. Project is very WIP at the moment. 
