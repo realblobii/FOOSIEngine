@@ -3,7 +3,9 @@
 
 #include <string>
 #include <vector>
+#include "incl/glad/glad.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include "engine/render/texture.h"
 #include "engine/tile/tilemap.h"
