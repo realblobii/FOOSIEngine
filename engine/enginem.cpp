@@ -17,21 +17,28 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
 
         std::cout << "SDL Successfully Initialised!" << std::endl;
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags|SDL_WINDOW_OPENGL);
         if (window) {
             std::cout << "Window Creation Success!" << std::endl;
         }
-
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        if (renderer) {
-            SDL_SetRenderDrawColor(renderer,255,255,255,255);
-            std::cout << "Renderer Creation Success!" << std::endl;
+        glContext = SDL_GL_CreateContext(window);
+        if (!glContext) {
+        std::cerr << "OpenGL context failed! SDL_Error: "
+                  << SDL_GetError() << std::endl;
+                  isRunning = false;
         }
-          
-        if( ( IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG ) )
-        {
-            std::cout << "IMG Init Success!" << std::endl;
+        if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+            std::cerr << "Failed to initialize GLAD!" << std::endl;
+        
         }
+        std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << "\n";
 
         sdl_sx = w;
         sdl_sy = h;
@@ -39,6 +46,7 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         
         if (!objMgr) {this->objMgr = new objManager("assets/objects.json");}
         if (!rPipeline){this->rPipeline = new renderPipeline(this);}
+        rPipeline->initTests();
 
 
     } else {
@@ -71,17 +79,18 @@ void Engine::getDeltaT(){
 }
 
 void Engine::render() {
-    SDL_RenderClear(renderer);
+    //SDL_RenderClear(renderer);
 
-    rPipeline->renderAll();
+    //rPipeline->renderAll();
 
-    SDL_RenderPresent(renderer);
+    //SDL_RenderPresent(renderer);
 
     Uint32 frameTime = SDL_GetTicks() - currentTime;
     if (frameTime < TARGET_FRAME_TIME)
     {
       SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frameTime));
     }
+    rPipeline->rainbowTriangle();
 }
 
 Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
@@ -156,6 +165,10 @@ void Engine::clean() {
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    glDeleteVertexArrays(1,  &rPipeline->VAO);
+    glDeleteBuffers(1, &rPipeline->VBO);
+    glDeleteProgram(rPipeline->shaderProgram);
+    SDL_GL_DeleteContext(glContext);
     IMG_Quit();
     SDL_Quit();
     std::cout << "Engine Closed Successfully\n";

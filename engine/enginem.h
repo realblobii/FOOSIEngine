@@ -1,6 +1,9 @@
 #ifndef ENGINEM_H
 #define ENGINEM_H
 
+
+
+// INCLUDES FOR ENGINE
 #include <string>
 #include <vector>
 #include "incl/glad/glad.h"
@@ -36,6 +39,7 @@ public:
 
     bool running() { return isRunning; }
     SDL_Renderer* getRenderer() { return renderer; }
+    SDL_Window* getWindow() { return window; }
 
     TileMap* tileMap = nullptr;     
     objManager* objMgr = nullptr; 
@@ -55,6 +59,7 @@ private:
     std::unordered_map<std::string, Texture*> textureCache; 
     Uint32 fpsLastTime = 0;  // Last time we updated FPS
     int fpsFrames = 0;        // Frames counted since last FPS update
+    SDL_GLContext glContext;
 };
 
 #endif // ENGINEM_H
