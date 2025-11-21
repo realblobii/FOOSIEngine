@@ -5,23 +5,44 @@
 #include "engine/render/renderm.h"
 #include <algorithm>
 #include <iostream>
+#include "incl/stb_image.h"
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+const char* vertexShaderSource = 
+"#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec4 aColor;\n"
+"layout (location = 2) in vec2 aTexCoord;\n"
+"\n"
+"out vec4 ourColor;\n"
+"out vec2 TexCoord;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    gl_Position = vec4(aPos, 1.0);\n"
+"    ourColor = aColor;\n"
+"    TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
+"}\n";
+
+const char* fragmentShaderSource =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"\n"
+"in vec4 ourColor;\n"
+"in vec2 TexCoord;\n"
+"\n"
+"uniform sampler2D texture1;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    FragColor = texture(texture1, TexCoord);\n"
+"}\n";
 
 renderPipeline::renderPipeline(Engine* eng)
     : engine(eng), registry(&eng->objMgr->registry)
 {
+    stbi_set_flip_vertically_on_load(true); // flip the image vertically
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
@@ -62,10 +83,16 @@ renderPipeline::renderPipeline(Engine* eng)
 
 void renderPipeline::initTests(){
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
-    }; 
+    // positions        // colors         // tex coords
+     0.5f,  0.5f, 0.0f,  1,0,0,  1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,  0,1,0,  1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,  0,0,1,  0.0f, 0.0f, // bottom left
+
+    -0.5f, -0.5f, 0.0f,  0,0,1,  0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,  1,1,0,  0.0f, 1.0f, // top left
+     0.5f,  0.5f, 0.0f,  1,0,0,  1.0f, 1.0f  // top right
+};
+
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -75,8 +102,21 @@ void renderPipeline::initTests(){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // STRIDE: 8 floats per vertex
+GLsizei stride = 8 * sizeof(float);
+
+// Position (location 0)
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+glEnableVertexAttribArray(0);
+
+// Color (location 1)
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+glEnableVertexAttribArray(1);
+
+// TexCoord (location 2)
+glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+glEnableVertexAttribArray(2);
+
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
@@ -84,15 +124,42 @@ void renderPipeline::initTests(){
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
+
+        
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+   unsigned char* data = stbi_load("assets/grass.png", &width, &height, &nrChannels, 0);
+
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
 }
 void renderPipeline::rainbowTriangle(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glBindTexture(GL_TEXTURE_2D, texture);
         // draw our first triangle
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         SDL_GL_SwapWindow(engine->getWindow());
 }

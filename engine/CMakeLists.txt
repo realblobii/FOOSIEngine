@@ -12,9 +12,11 @@ add_library(engine STATIC
 
 # Glad is its own static library
 add_library(glad STATIC ../incl/glad/glad.c)
+add_library(stb_image STATIC ../incl/stb_image.cpp)
 
 # Glad needs its include dir
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl)
+target_include_directories(stb_image PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl)
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -32,9 +34,13 @@ target_include_directories(engine
 target_include_directories(glad
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../incl
 )
+target_include_directories(stb_image
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../incl
+)
 target_link_libraries(engine
     PUBLIC
         glad               # you forgot this
+        stb_image
         OpenGL::GL
         ${SDL2_LIBRARIES}
         ${SDL2_IMAGE_LIBRARIES}

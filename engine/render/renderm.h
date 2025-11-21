@@ -18,6 +18,7 @@ public:
 private:
     Engine* engine = nullptr; 
     std::vector<std::unique_ptr<Object>>* registry = nullptr; 
+    unsigned int texture;
 };
 
 #endif 
