@@ -6,6 +6,7 @@
 #include <memory>
 #include "engine/obj/obj.h"
 #include "engine/enginem.h"
+#include "engine/render/texture.h"
 #include "incl/learnopengl/shader_s.h"
 
 class renderPipeline {
@@ -14,14 +15,20 @@ public:
     void renderAll();
     void initTests();
     void rainbowTriangle();
-    unsigned int VBO,VAO,shaderProgram;
 
 private:
     Engine* engine = nullptr; 
     Shader defaultShader;
     Shader* defaultSptr = nullptr;
+
+    vao dVAO;   // <---- ADD THESE
+    vbo dVBO;   // <----
+    Texture dTex;
+
+    Texture*dTexptr;
+
     std::vector<std::unique_ptr<Object>>* registry = nullptr; 
-    unsigned int texture;
+    
 };
 
 #endif 

@@ -1,83 +1,33 @@
 #include "engine/render/texture.h"
 #include <iostream>
 
-Texture::Texture(SDL_Renderer* renderer)
-    : renderer(renderer),
-      texture(nullptr),
-      width(0),
-      height(0),
-      x(0),
-      y(0),
-      angle(0.0),
-      center(nullptr),
-      cliprect(nullptr),
-      fliptype(SDL_FLIP_NONE)
-{}
+Texture::Texture(const std::string filename){
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+   unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 
-Texture::~Texture() {
-    free();
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 }
 
-bool Texture::loadFromFile(const std::string& filename) {
-    free(); 
-
-    SDL_Surface* surface = IMG_Load(filename.c_str());
-    if (!surface) {
-        std::cerr << "Texture error: Could not load " << filename
-                  << " | SDL_image Error: " << IMG_GetError() << std::endl;
-        return false;
-    }
-
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (!texture) {
-        std::cerr << "Texture error: Could not create texture from "
-                  << filename << " | SDL Error: " << SDL_GetError() << std::endl;
-        SDL_FreeSurface(surface);
-        return false;
-    }
-
-    width = surface->w;
-    height = surface->h;
-    SDL_FreeSurface(surface);
-    return true;
+void Texture::bind(){
+    glBindTexture(GL_TEXTURE_2D, texture);
 }
-
-void Texture::setTransform(int x, int y, double angle,
-                           SDL_Point* center,
-                           SDL_Rect* cliprect,
-                           SDL_RendererFlip fliptype) {
-    this->x = x;
-    this->y = y;
-    this->angle = angle;
-    this->center = center;
-    this->cliprect = cliprect;
-    this->fliptype = fliptype;
-}
-
-void Texture::render(int x, int y, SDL_Rect* clip) const {
-    if (!texture) {
-        std::cerr << "Warning: Tried to render a null texture!" << std::endl;
-        return;
-    }
-
-    SDL_Rect dstRect = { (x >= 0 ? x : this->x),
-                         (y >= 0 ? y : this->y),
-                         width, height };
-
-    const SDL_Rect* srcRect = clip ? clip : cliprect;
-    if (srcRect) {
-        dstRect.w = srcRect->w;
-        dstRect.h = srcRect->h;
-    }
-
-    SDL_RenderCopyEx(renderer, texture, srcRect, &dstRect,
-                     angle, center, fliptype);
-}
-
-void Texture::free() {
-    if (texture) {
-        SDL_DestroyTexture(texture);
-        texture = nullptr;
-        width = height = 0;
-    }
-}
+   

@@ -3,25 +3,9 @@
 #include <algorithm>
 #include <iostream>
 #include "incl/stb_image.h"
+#include "engine/render/glAbstract.h"
 
-
-
-renderPipeline::renderPipeline(Engine* eng)
-    : engine(eng),
-      registry(&eng->objMgr->registry),
-      defaultShader("shader/default.vs", "shader/default.fs")   // construct here!
-{
-    stbi_set_flip_vertically_on_load(true);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    defaultSptr = &defaultShader;
-    char infoLog[512];
-}
-
-void renderPipeline::initTests(){
-    float vertices[] = {
+float testVertices[] = {
     // positions        // colors         // tex coords
      0.5f,  0.5f, 0.0f,  1,0,0,  1.0f, 1.0f, // top right
      0.5f, -0.5f, 0.0f,  0,1,0,  1.0f, 0.0f, // bottom right
@@ -33,71 +17,33 @@ void renderPipeline::initTests(){
 };
 
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+renderPipeline::renderPipeline(Engine* eng)
+    : engine(eng),
+      registry(&eng->objMgr->registry),
+      defaultShader("shader/default.vs", "shader/default.fs"),
+      dTex("assets/grass.png"),
+      dVAO(),
+      dVBO(testVertices)
+{
+    stbi_set_flip_vertically_on_load(true);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // STRIDE: 8 floats per vertex
-GLsizei stride = 8 * sizeof(float);
-
-// Position (location 0)
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-glEnableVertexAttribArray(0);
-
-// Color (location 1)
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-glEnableVertexAttribArray(1);
-
-// TexCoord (location 2)
-glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
-glEnableVertexAttribArray(2);
-
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
-
-        
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-   unsigned char* data = stbi_load("assets/grass.png", &width, &height, &nrChannels, 0);
-
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
+    defaultSptr = &defaultShader;
+    char infoLog[512];
 }
+
+
 void renderPipeline::rainbowTriangle(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        
         // draw our first triangle
+        dTex.bind();
         defaultSptr->use();
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        dVAO.bind();// seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         SDL_GL_SwapWindow(engine->getWindow());
