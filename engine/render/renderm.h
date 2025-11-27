@@ -6,6 +6,7 @@
 #include <memory>
 #include "engine/obj/obj.h"
 #include "engine/enginem.h"
+#include "incl/learnopengl/shader_s.h"
 
 class renderPipeline {
 public:
@@ -17,6 +18,8 @@ public:
 
 private:
     Engine* engine = nullptr; 
+    Shader defaultShader;
+    Shader* defaultSptr = nullptr;
     std::vector<std::unique_ptr<Object>>* registry = nullptr; 
     unsigned int texture;
 };
