@@ -1,6 +1,6 @@
 #include "engine/render/glAbstract.h"
 
-GLsizei stride = 8 * sizeof(float);
+GLsizei stride = 32;
 
 vao::vao(){
     glGenVertexArrays(1, &VAO);
