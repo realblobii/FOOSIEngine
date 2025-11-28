@@ -4,6 +4,8 @@
 #include <iostream>
 #include "incl/stb_image.h"
 
+
+
 float testVertices[] = {
     // positions        // colors         // tex coords
      0.5f,  0.5f, 0.0f,  1,0,0,  1.0f, 1.0f, // top right
@@ -22,19 +24,15 @@ renderPipeline::renderPipeline(Engine* eng)
       defaultShader("shader/default.vs", "shader/default.fs"),
       dTex("assets/grass.png"),
       dVAO(),
-      dVBO(testVertices)
+      dVBO(testVertices, sizeof(testVertices) / sizeof(float))
 {
-    stbi_set_flip_vertically_on_load(true);
+    
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     char infoLog[512];
 }
 
-void renderPipeline::freeGlObjects(){
-    destroy(dVAO);
-        
-}
 void renderPipeline::rainbowTriangle(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);

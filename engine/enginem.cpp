@@ -44,8 +44,9 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
 
         
         if (!objMgr) {this->objMgr = new objManager("assets/objects.json");}
-        if (!rPipeline){this->rPipeline = new renderPipeline(this);}
-        rPipeline->initTests();
+        if (!rPipeline){
+            stbi_set_flip_vertically_on_load(true);
+            this->rPipeline = new renderPipeline(this);}
 
 
     } else {
@@ -164,7 +165,6 @@ void Engine::clean() {
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    rPipeline->freeGlObjects();
     SDL_GL_DeleteContext(glContext);
     IMG_Quit();
     SDL_Quit();

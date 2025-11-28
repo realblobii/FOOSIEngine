@@ -1,15 +1,18 @@
 #include "engine/enginem.h"
 
-unsigned int VBO,VAO;
-GLsizei stride = 8 * sizeof(float);
+
 class vao{
     public:
         vao();
         ~vao();
         void bind();
+    private:
+        unsigned int VAO;
 };
-class vbo{
-    public:
-        vbo(float vertices[]);
-        ~vbo();
+class vbo {
+public:
+    vbo(const float* vertices, size_t count);
+    ~vbo();
+private:
+    unsigned int VBO;
 };
