@@ -5,6 +5,9 @@ vao::vao(){
     glBindVertexArray(VAO);
     
 }
+vao::~vao(){
+    glDeleteVertexArrays(1,&VAO);
+}
 void vao::bind(){
      glBindVertexArray(VAO);
 }
@@ -25,4 +28,7 @@ vbo::vbo(float vertices[]){
     glEnableVertexAttribArray(2);
 
 
+}
+vbo::~vbo(){
+    glDeleteBuffers(1,&VBO);
 }

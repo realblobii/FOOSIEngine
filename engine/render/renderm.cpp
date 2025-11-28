@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iostream>
 #include "incl/stb_image.h"
-#include "engine/render/glAbstract.h"
 
 float testVertices[] = {
     // positions        // colors         // tex coords
@@ -29,12 +28,13 @@ renderPipeline::renderPipeline(Engine* eng)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    defaultSptr = &defaultShader;
     char infoLog[512];
 }
 
-
+void renderPipeline::freeGlObjects(){
+    destroy(dVAO);
+        
+}
 void renderPipeline::rainbowTriangle(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -42,13 +42,13 @@ void renderPipeline::rainbowTriangle(){
         
         // draw our first triangle
         dTex.bind();
-        defaultSptr->use();
+        defaultShader.use();
         dVAO.bind();// seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         SDL_GL_SwapWindow(engine->getWindow());
 }
-void renderPipeline::renderAll() {
+/* void renderPipeline::renderAll() {
     if (!registry || registry->empty()) {
         std::cerr << "[renderPipeline] Warning: registry is empty or null\n";
         return;
@@ -96,3 +96,4 @@ void renderPipeline::renderAll() {
         tex->render();
     }
 }
+ */

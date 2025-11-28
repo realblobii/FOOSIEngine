@@ -6,6 +6,7 @@ add_library(engine STATIC
     enginem.cpp
     render/texture.cpp
     render/renderm.cpp
+    render/glAbstract.cpp
     tile/tilemap.cpp
     obj/obj_mgr.cpp
 )

@@ -92,7 +92,7 @@ void Engine::render() {
     rPipeline->rainbowTriangle();
 }
 
-Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
+/* Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
     // 1. Check cache first
     auto it = textureCache.find(filename);
     if (it != textureCache.end()) {
@@ -118,7 +118,7 @@ Texture* Engine::loadTexture(const std::string& filename, int x, int y, int widt
     textures.push_back(tex);
     textureCache[filename] = tex; // store in cache
     return tex;
-}
+} */
 
 void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight) {
     if (tileMap) {
@@ -142,11 +142,11 @@ void Engine::printFPS() {
 
 
 void Engine::clean() {
-    for (auto& tex : textures)
+  /*   for (auto& tex : textures)
     delete tex;
     textures.clear();
     textureCache.clear();
-
+ */
 
     if (tileMap) {
         delete tileMap;
@@ -164,9 +164,7 @@ void Engine::clean() {
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    glDeleteVertexArrays(1,  &rPipeline->VAO);
-    glDeleteBuffers(1, &rPipeline->VBO);
-    glDeleteProgram(rPipeline->shaderProgram);
+    rPipeline->freeGlObjects();
     SDL_GL_DeleteContext(glContext);
     IMG_Quit();
     SDL_Quit();
