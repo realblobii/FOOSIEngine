@@ -28,6 +28,9 @@ vbo::vbo(const float* vertices, size_t count) {
     glEnableVertexAttribArray(2);
 }
 
+void vbo::bind(){
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+}
 vbo::~vbo(){
     glDeleteBuffers(1,&VBO);
 }

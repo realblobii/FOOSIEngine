@@ -14,6 +14,7 @@ class renderPipeline {
 public:
     explicit renderPipeline(Engine* eng);
     void renderAll();
+    void draw(vbo& VBO, Texture& tex);
     void initTests();
     void rainbowTriangle();
     void freeGlObjects();

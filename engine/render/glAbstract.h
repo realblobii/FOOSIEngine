@@ -13,6 +13,7 @@ class vbo {
 public:
     vbo(const float* vertices, size_t count);
     ~vbo();
+    void bind();
 private:
     unsigned int VBO;
 };

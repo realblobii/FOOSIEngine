@@ -33,6 +33,12 @@ renderPipeline::renderPipeline(Engine* eng)
     char infoLog[512];
 }
 
+void renderPipeline::draw(vbo& VBO, Texture& tex){
+    tex.bind();
+    dVAO.bind();
+    VBO.bind();
+    glDrawArrays(GL_TRIANGLES, 0, (sizeof(testVertices) / sizeof(float))/8);
+}
 void renderPipeline::rainbowTriangle(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -40,9 +46,8 @@ void renderPipeline::rainbowTriangle(){
         
         // draw our first triangle
         defaultShader.use();
-        dTex.bind();
-        dVAO.bind();// seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawArrays(GL_TRIANGLES, 0, (sizeof(testVertices) / sizeof(float))/8);
+        draw(dVBO, dTex);
+        
 
         SDL_GL_SwapWindow(engine->getWindow());
 }
