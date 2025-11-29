@@ -23,7 +23,9 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); 
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags|SDL_WINDOW_OPENGL);
+       window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
+                          SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+
         if (window) {
             std::cout << "Window Creation Success!" << std::endl;
         }
@@ -35,8 +37,10 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         }
         if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
             std::cerr << "Failed to initialize GLAD!" << std::endl;
-        
+            isRunning = false;   // you need this!
+            return;
         }
+
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << "\n";
 
         sdl_sx = w;
@@ -79,47 +83,19 @@ void Engine::getDeltaT(){
 }
 
 void Engine::render() {
-    //SDL_RenderClear(renderer);
-
-    //rPipeline->renderAll();
-
-    //SDL_RenderPresent(renderer);
+    
+    rPipeline->renderAll();
+    SDL_GL_SwapWindow(window);
 
     Uint32 frameTime = SDL_GetTicks() - currentTime;
     if (frameTime < TARGET_FRAME_TIME)
     {
       SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frameTime));
     }
-    rPipeline->rainbowTriangle();
+    //rPipeline->rainbowTriangle();
 }
 
-/* Texture* Engine::loadTexture(const std::string& filename, int x, int y, int width, int height) {
-    // 1. Check cache first
-    auto it = textureCache.find(filename);
-    if (it != textureCache.end()) {
-        Texture* tex = it->second;
-        tex->setTransform(x, y);
-        return tex; // reuse cached texture
-    }
 
-    // 2. Not found, load new texture
-    Texture* tex = new Texture(renderer);
-    if (!tex->loadFromFile(filename)) {
-        std::cerr << "Failed to load texture: '" << filename << "'\n";
-        delete tex;
-        return nullptr;
-    }
-
-    tex->setTransform(x, y);
-    if (width > 0 && height > 0){
-        SDL_Rect src = {0,0,width,height};
-    tex->setTransform(x, y, 0.0, nullptr, &src);
-    }
-
-    textures.push_back(tex);
-    textureCache[filename] = tex; // store in cache
-    return tex;
-} */
 
 void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight) {
     if (tileMap) {
@@ -143,11 +119,10 @@ void Engine::printFPS() {
 
 
 void Engine::clean() {
-  /*   for (auto& tex : textures)
+  /* for (auto& tex : textures){
     delete tex;
     textures.clear();
-    textureCache.clear();
- */
+    } */
 
     if (tileMap) {
         delete tileMap;
@@ -163,7 +138,6 @@ void Engine::clean() {
         rPipeline = nullptr;
     }
 
-    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_GL_DeleteContext(glContext);
     IMG_Quit();

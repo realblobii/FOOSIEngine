@@ -38,7 +38,6 @@ public:
                          int width = 0, int height = 0);
  */
     bool running() { return isRunning; }
-    SDL_Renderer* getRenderer() { return renderer; }
     SDL_Window* getWindow() { return window; }
 
     TileMap* tileMap = nullptr;     
@@ -51,12 +50,13 @@ public:
 
     float deltaTime;
 
+
+
 private:
     bool isRunning = false;
     SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-    /* std::vector<Texture*> textures; 
-    std::unordered_map<std::string, Texture*> textureCache;  */
+    //std::vector<Texture*> textures; 
+    //std::unordered_map<std::string, Texture*> textureCache;  */
     Uint32 fpsLastTime = 0;  // Last time we updated FPS
     int fpsFrames = 0;        // Frames counted since last FPS update
     SDL_GLContext glContext;
