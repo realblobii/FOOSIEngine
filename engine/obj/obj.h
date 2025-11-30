@@ -33,7 +33,7 @@ public:
     
     virtual void resolveTexture(const objManager& mgr);
     virtual void setTex(const std::string& newRef, const objManager& mgr);
-    virtual void Update(float deltaTime){}
+    virtual void Update(){}
 };
 
 #endif

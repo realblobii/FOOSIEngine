@@ -28,7 +28,7 @@ public:
 
     void Init(const char* title, int w, int h, bool fullscreen);
     void handleEvents();
-    void update(float deltaTime);
+    void update();
     void render();
     void clean();
     void printFPS();
@@ -48,7 +48,6 @@ public:
     
     int sdl_sx, sdl_sy;
 
-    float deltaTime;
 
 
 
@@ -57,8 +56,6 @@ private:
     SDL_Window* window = nullptr;
     //std::vector<Texture*> textures; 
     //std::unordered_map<std::string, Texture*> textureCache;  */
-    Uint32 fpsLastTime = 0;  // Last time we updated FPS
-    int fpsFrames = 0;        // Frames counted since last FPS update
     SDL_GLContext glContext;
 };
 

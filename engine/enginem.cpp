@@ -5,12 +5,6 @@
 Engine::Engine() {}
 Engine::~Engine() {}
 
-const int TARGET_FPS = 60;
-const float TARGET_FRAME_TIME = 1000.0f / TARGET_FPS; 
-Uint32 currentTime;
-
-Uint32 lastTime = SDL_GetTicks();
-
 void Engine::Init(const char* title, int w, int h, bool fullscreen) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN;
@@ -71,15 +65,10 @@ while (SDL_PollEvent(&event)) {
     }
 }
 }
-void Engine::update(float deltaTime) {
+void Engine::update() {
     for (auto& obj : objMgr->registry){
-        obj->Update(deltaTime);
+        obj->Update();
     }
-}
-void Engine::getDeltaT(){
-    currentTime = SDL_GetTicks();
-    deltaTime = (currentTime - lastTime) / 1000.0f; // seconds
-    lastTime = currentTime;
 }
 
 void Engine::render() {
@@ -87,12 +76,6 @@ void Engine::render() {
     rPipeline->renderAll();
     SDL_GL_SwapWindow(window);
 
-    Uint32 frameTime = SDL_GetTicks() - currentTime;
-    if (frameTime < TARGET_FRAME_TIME)
-    {
-      SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frameTime));
-    }
-    //rPipeline->rainbowTriangle();
 }
 
 
@@ -105,17 +88,7 @@ void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHei
 }
 
 
-void Engine::printFPS() {
-    fpsFrames++;
-    Uint32 currentTime = SDL_GetTicks(); 
 
-    if (currentTime - fpsLastTime >= 1000) { 
-        int fps = fpsFrames;
-        std::cout << "FPS: " << fps << std::endl;
-        fpsFrames = 0;
-        fpsLastTime = currentTime;
-    }
-}
 
 
 void Engine::clean() {

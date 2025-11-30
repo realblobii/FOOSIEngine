@@ -30,10 +30,4 @@ public:
     ~fbo();
     void bind();
     void unbind();
-    GLuint getTexture() const { return texture; }
-private:
-    GLuint FBO = 0;
-    GLuint texture = 0;
-    GLuint RBO = 0;
-    int w, h;
 };
