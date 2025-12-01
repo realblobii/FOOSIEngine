@@ -15,4 +15,4 @@ jobs:
       - name: Count Lines of Code (cloc)
         uses: djdefi/cloc-action@6
         with:
-          exclude_dir: incl
+          args: "game engine" 
