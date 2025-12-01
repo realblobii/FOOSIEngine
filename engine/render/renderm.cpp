@@ -1,8 +1,8 @@
 #include "engine/render/renderm.h"
 #include <algorithm>
-#include <iostream>
-#include "incl/stb_image.h"
+#include <cstring> // memcpy
 
+// quadTemplate same as your version (posx,posy,posz, nx,ny,nz, u,v)
 const float renderPipeline::quadTemplate[6*8] = {
     0,  0, 0,  0,0,1,  1,1,
     64, 0, 0,  0,0,1,  0,1,
@@ -14,28 +14,34 @@ const float renderPipeline::quadTemplate[6*8] = {
 
 renderPipeline::renderPipeline(Engine* eng)
     : engine(eng),
-      registry(&eng->objMgr->registry),
       defaultShader("shader/default.vs", "shader/default.fs"),
-      dTex("assets/grass.png"),
-      dVAO()
+      registry(&eng->objMgr->registry)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    // create empty VBO (we will allocate with update)
+    globalVBO = new vbo(nullptr, 0);
 }
 
 renderPipeline::~renderPipeline() {
-    for (auto& [path, batch] : tileBatches) {
-        delete batch.VBO;
-        delete batch.VAO;
-        // textures managed by loadedTextures
+    // free raw images
+    for (auto &p : rawImages) {
+        if (p.second.pixels) stbi_image_free(p.second.pixels);
     }
-}
+    rawImages.clear();
 
-void renderPipeline::draw(vbo& VBO, Texture& tex) {
-    tex.bind();
-    dVAO.bind();
-    VBO.bind();
-    glDrawArrays(GL_TRIANGLES, 0, VBO.getCount());
+    if (globalVBO) {
+        delete globalVBO;
+        globalVBO = nullptr;
+    }
+
+    if (atlasTex) {
+        glDeleteTextures(1, &atlasTex);
+        atlasTex = 0;
+    }
 }
 
 float renderPipeline::screenToNDCx(int screenX) {
@@ -45,84 +51,180 @@ float renderPipeline::screenToNDCy(int screenY) {
     return 1.0f - (2.0f * float(screenY) / float(engine->sdl_sy));
 }
 
-// Converts object to a glTile (non-tile objects only)
-glTile renderPipeline::obj2gl(const Object* obj) {
+// Ensure image is loaded into rawImages (RGBA)
+bool renderPipeline::ensureImageLoaded(const std::string& path) {
+    if (rawImages.count(path)) return true;
+
+    int w,h,channels;
+    unsigned char* data = stbi_load(path.c_str(), &w, &h, &channels, 4);
+    if (!data) {
+        std::cerr << "renderPipeline: failed to load image: " << path << std::endl;
+        return false;
+    }
+    RawImage ri;
+    ri.w = w;
+    ri.h = h;
+    ri.pixels = data;
+    rawImages[path] = ri;
+    return true;
+}
+
+// Build a simple shelf-packed atlas and upload to GPU
+void renderPipeline::buildAtlasFromRawImages() {
+    if (atlasBuilt) return;
+
+    const int ATLAS_W = ATLAS_SIZE;
+    const int ATLAS_H = ATLAS_SIZE;
+
+    // Gather list of images to pack (rawImages must be filled)
+    std::vector<std::pair<std::string, RawImage>> imgs;
+    imgs.reserve(rawImages.size());
+    for (auto &p : rawImages) imgs.push_back(p);
+
+    // Simple shelf packer: place images left-to-right, when no space -> new row
+    int curX = 0;
+    int curY = 0;
+    int rowH = 0;
+
+    // create atlas pixel buffer RGBA
+    size_t atlasBytes = size_t(ATLAS_W) * size_t(ATLAS_H) * 4;
+    unsigned char* atlasPixels = (unsigned char*)malloc(atlasBytes);
+    if (!atlasPixels) {
+        std::cerr << "renderPipeline: failed to allocate atlas buffer\n";
+        return;
+    }
+    // initialize transparent
+    memset(atlasPixels, 0, atlasBytes);
+
+    for (auto &p : imgs) {
+        const std::string &path = p.first;
+        const RawImage &ri = p.second;
+
+        if (ri.w <= 0 || ri.h <= 0) {
+            std::cerr << "renderPipeline: invalid image size: " << path << "\n";
+            continue;
+        }
+
+        // If image doesn't fit in current row, move to next row
+        if (curX + ri.w > ATLAS_W) {
+            curX = 0;
+            curY += rowH;
+            rowH = 0;
+        }
+
+        // If it doesn't fit vertically -> fail (you can expand atlas or handle)
+        if (curY + ri.h > ATLAS_H) {
+            std::cerr << "renderPipeline: atlas overflow, image too large or atlas too small: " << path << "\n";
+            continue; // skip this image (transparent will show)
+        }
+
+        // copy rows into atlasPixels
+        for (int row = 0; row < ri.h; ++row) {
+            unsigned char* dst = atlasPixels + ( (curY + row) * ATLAS_W + curX ) * 4;
+            unsigned char* src = ri.pixels + row * ri.w * 4;
+            memcpy(dst, src, ri.w * 4);
+        }
+
+        // store UV coords (note: v coordinate flip depending on your texture coordinates convention)
+        float u0 = float(curX) / float(ATLAS_W);
+        float v0 = float(curY) / float(ATLAS_H);
+        float u1 = float(curX + ri.w) / float(ATLAS_W);
+        float v1 = float(curY + ri.h) / float(ATLAS_H);
+
+        // store in atlasMap
+        atlasMap[path] = SubTexture{u0, v0, u1, v1};
+
+        // advance
+        curX += ri.w;
+        if (ri.h > rowH) rowH = ri.h;
+    }
+
+    // upload to GL
+    glGenTextures(1, &atlasTex);
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // upload
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ATLAS_W, ATLAS_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlasPixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // free temporary atlasPixels (rawImages kept until destructor)
+    free(atlasPixels);
+
+    atlasBuilt = true;
+    std::cout << "renderPipeline: atlas built with " << atlasMap.size() << " entries\n";
+}
+
+// If you load textures dynamically, call this to rebuild atlas
+void renderPipeline::rebuildAtlas() {
+    // remake atlas from current rawImages
+    if (atlasTex) {
+        glDeleteTextures(1, &atlasTex);
+        atlasTex = 0;
+    }
+    atlasMap.clear();
+    atlasBuilt = false;
+    buildAtlasFromRawImages();
+}
+
+// Append object vertices to world verts using the subtexture UVs and depth
+void renderPipeline::appendObjectToVerts(std::vector<float>& verts, const Object* obj, const SubTexture& uv, float zdepth) {
     const int TILE_W = 64;
     const int TILE_H = 64;
     const int OFFSET_X = engine->sdl_sx/2;
     const int OFFSET_Y = engine->sdl_sy/2;
 
-    float screenXf = (obj->x - obj->y)*(TILE_W/2.0f)+OFFSET_X;
-    float screenYf = (obj->x + obj->y)*10 - obj->z*42 + OFFSET_Y;
+    float screenXf = (obj->x - obj->y) * (TILE_W/2.0f) + OFFSET_X;
+    float screenYf = (obj->x + obj->y) * 10 - obj->z * 42 + OFFSET_Y;
 
     int baseX = int(screenXf);
     int baseY = int(screenYf);
 
-    std::vector<float> verts;
-    verts.reserve(6*8);
-
-    for (int i=0;i<6;i++){
+    for (int i = 0; i < 6; ++i) {
         const float* v = &quadTemplate[i*8];
-        float px = baseX+v[0];
-        float py = baseY+v[1];
+        float px = baseX + v[0];
+        float py = baseY + v[1];
 
         verts.push_back(screenToNDCx(int(px)));
         verts.push_back(screenToNDCy(int(py)));
-        verts.push_back(0.0f);
-        verts.push_back(v[3]);
-        verts.push_back(v[4]);
-        verts.push_back(v[5]);
-        verts.push_back(v[6]);
-        verts.push_back(v[7]);
+        verts.push_back(zdepth);
+        verts.push_back(v[3]); // nx
+        verts.push_back(v[4]); // ny
+        verts.push_back(v[5]); // nz
+
+        // remap uv from [0..1] to atlas uv
+        float su = uv.u0 + v[6] * (uv.u1 - uv.u0);
+        float sv = uv.v0 + v[7] * (uv.v1 - uv.v0);
+        verts.push_back(su);
+        verts.push_back(sv);
     }
-
-    Texture* texPtr = nullptr;
-    if (loadedTextures.count(obj->texture)==0)
-        loadedTextures[obj->texture] = std::make_unique<Texture>(obj->texture);
-    texPtr = loadedTextures[obj->texture].get();
-
-    return glTile{ vbo(verts.data(), verts.size()), *texPtr };
 }
 
-// Adds a tile's vertices to a batch
-void renderPipeline::batchTile(TileBatch& batch, const Object* obj) {
-    const int TILE_W = 64;
-    const int TILE_H = 64;
-    const int OFFSET_X = engine->sdl_sx/2;
-    const int OFFSET_Y = engine->sdl_sy/2;
-
-    float screenXf = (obj->x - obj->y)*(TILE_W/2.0f)+OFFSET_X;
-    float screenYf = (obj->x + obj->y)*10 - obj->z*42 + OFFSET_Y;
-
-    int baseX = int(screenXf);
-    int baseY = int(screenYf);
-
-    for (int i=0;i<6;i++){
-        const float* v = &quadTemplate[i*8];
-        float px = baseX+v[0];
-        float py = baseY+v[1];
-
-        batch.verts.push_back(screenToNDCx(int(px)));
-        batch.verts.push_back(screenToNDCy(int(py)));
-        batch.verts.push_back(0.0f);
-        batch.verts.push_back(v[3]);
-        batch.verts.push_back(v[4]);
-        batch.verts.push_back(v[5]);
-        batch.verts.push_back(v[6]);
-        batch.verts.push_back(v[7]);
-    }
-
-    batch.dirty = true;
-}
-
-// Main render function
+// Main renderAll: builds atlas (if needed), builds one big VBO, draws with single texture
 void renderPipeline::renderAll() {
     if (!registry || registry->empty()) return;
 
+    // Collect texture paths used by objects and ensure they're loaded into rawImages
+    for (auto &objPtr : *registry) {
+        if (!objPtr) continue;
+        const std::string &path = objPtr->texture;
+        if (!ensureImageLoaded(path)) {
+            // if load failed, you can fallback to a default texture path or continue
+            std::cerr << "renderPipeline: warning: missing texture: " << path << std::endl;
+        }
+    }
+
+    // Build atlas once
+    if (!atlasBuilt) buildAtlasFromRawImages();
+
+    // Clear GL buffers
     glClearColor(0.2f,0.3f,0.3f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Sort objects
+    // Sort objects in iso order
     std::vector<Object*> sorted;
     for (auto& obj : *registry) if (obj) sorted.push_back(obj.get());
     std::sort(sorted.begin(), sorted.end(), [](Object* a, Object* b){
@@ -131,52 +233,39 @@ void renderPipeline::renderAll() {
         return a->x<b->x;
     });
 
-    // Build batches
+    // Build single worldVerts
+    std::vector<float> worldVerts;
+    worldVerts.reserve(sorted.size() * 6 * 8); // heuristic
+
+    int index = 0;
     for (auto* obj : sorted) {
-        if (obj->obj_class=="tile") {
-            // create batch if not exist
-            if (tileBatches.count(obj->texture)==0) {
-                TileBatch batch;
-                // create persistent VBO + VAO
-                batch.VAO = new vao();
-                batch.VBO = new vbo(batch.verts.data(), batch.verts.size());
-                // store texture
-                if (loadedTextures.count(obj->texture)==0)
-                    loadedTextures[obj->texture] = std::make_unique<Texture>(obj->texture);
-                batch.tex = loadedTextures[obj->texture].get();
-                tileBatches[obj->texture] = batch;
-            }
-            batchTile(tileBatches[obj->texture], obj);
+        SubTexture uv;
+        if (atlasMap.count(obj->texture)) {
+            uv = atlasMap[obj->texture];
         } else {
-            // Non-tile object
-            glTile t = obj2gl(obj);
-            defaultShader.use();
-            dVAO.bind();
-            draw(t.VBO, t.texture);
+            // fallback: if texture wasn't packed (overflow), use a 1x1 transparent uv at 0,0
+            uv = SubTexture{0.0f,0.0f,1.0f,1.0f};
         }
+        float depth = -0.000001f * float(index++); // small offset per object
+        appendObjectToVerts(worldVerts, obj, uv, depth);
     }
 
-    // Draw all tile batches
-    for (auto& [texPath, batch] : tileBatches) {
-        if (batch.verts.empty()) continue;
+    // Upload worldVerts to global VBO (one update per frame)
+    globalVAO.bind();
+    globalVBO->bind();
+    globalVBO->update(worldVerts.data(), worldVerts.size());
 
-        defaultShader.use();
-        batch.VAO->bind();
+    defaultShader.use();
 
-        if (batch.dirty) {
-            batch.VBO->bind();
-            batch.VBO->update(batch.verts.data(), batch.verts.size());
-            batch.dirty = false;
-        } else {
-                
-        }
+    // bind atlas texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+    // If your shader expects e.g. "tex" uniform, ensure it's set to 0 somewhere (once on init)
+    // defaultShader.setInt("tex", 0);
 
-        batch.tex->bind();
-        glDrawArrays(GL_TRIANGLES, 0, batch.verts.size()/8);
+    // single draw
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(worldVerts.size() / 8));
 
-        // clear verts for next frame
-        batch.verts.clear();
-    }
-
+    // swap
     SDL_GL_SwapWindow(engine->getWindow());
 }
