@@ -74,7 +74,6 @@ void Engine::update() {
 void Engine::render() {
     
     rPipeline->renderAll();
-    SDL_GL_SwapWindow(window);
 
 }
 
