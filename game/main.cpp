@@ -11,9 +11,8 @@ int main(int argc, const char *argv[])
   while (engine->running())
   {
     
-    engine->getDeltaT();
     engine->handleEvents();
-    engine->update(engine->deltaTime);
+    engine->update();
     engine->render();
   }
 

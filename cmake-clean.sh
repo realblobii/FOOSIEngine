@@ -1,0 +1,10 @@
+make clean;
+rm -rf CMakeFiles CMakeCache.txt Makefile;
+cd engine;
+make clean;
+rm -rf CMakeFiles CMakeCache.txt Makefile;
+cd ..;
+cd game;
+make clean;
+rm -rf CMakeFiles CMakeCache.txt Makefile;
+cd ..;

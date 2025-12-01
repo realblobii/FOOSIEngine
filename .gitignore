@@ -57,3 +57,4 @@ CMakeUserPresets.json
 # --- FOOSIE SPECIFIC IGNORES ---
 game/assets/
 game/obj_class/
+game/build/
