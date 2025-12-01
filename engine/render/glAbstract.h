@@ -24,10 +24,3 @@ private:
     GLsizei floatCount;
 };
 
-class fbo {
-public:
-    fbo(int width, int height);
-    ~fbo();
-    void bind();
-    void unbind();
-};
