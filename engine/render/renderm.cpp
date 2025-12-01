@@ -207,65 +207,79 @@ void renderPipeline::appendObjectToVerts(std::vector<float>& verts, const Object
 void renderPipeline::renderAll() {
     if (!registry || registry->empty()) return;
 
-    // Collect texture paths used by objects and ensure they're loaded into rawImages
+    // Compute camera rectangle (full screen for now, modify if using camera offset)
+    struct CameraRect {
+        int x0, y0, x1, y1;
+    };
+    CameraRect camRect{ 0, 0, engine->sdl_sx, engine->sdl_sy };
+
+    //  Ensure all textures used by objects are loaded
     for (auto &objPtr : *registry) {
         if (!objPtr) continue;
         const std::string &path = objPtr->texture;
         if (!ensureImageLoaded(path)) {
-            // if load failed, you can fallback to a default texture path or continue
             std::cerr << "renderPipeline: warning: missing texture: " << path << std::endl;
         }
     }
 
-    // Build atlas once
+    //  Build atlas once
     if (!atlasBuilt) buildAtlasFromRawImages();
 
-    // Clear GL buffers
-    glClearColor(0.2f,0.3f,0.3f,1.0f);
+    //  Clear GL buffers
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Sort objects in iso order
+    //  Sort objects in isometric order
     std::vector<Object*> sorted;
     for (auto& obj : *registry) if (obj) sorted.push_back(obj.get());
     std::sort(sorted.begin(), sorted.end(), [](Object* a, Object* b){
-        if (a->z!=b->z) return a->z<b->z;
-        if (a->y!=b->y) return a->y<b->y;
-        return a->x<b->x;
+        if (a->z != b->z) return a->z < b->z;
+        if (a->y != b->y) return a->y < b->y;
+        return a->x < b->x;
     });
 
-    // Build single worldVerts
+    //  Build worldVerts with culling
     std::vector<float> worldVerts;
-    worldVerts.reserve(sorted.size() * 6 * 8); // heuristic
+    worldVerts.reserve(sorted.size() * 6 * 8);
+
+    auto isObjectOnScreen = [&](const Object* obj) {
+        const int TILE_W = 64;
+        const int TILE_H = 64;
+        const int OFFSET_X = engine->sdl_sx / 2;
+        const int OFFSET_Y = engine->sdl_sy / 2;
+
+        float screenX = (obj->x - obj->y) * (TILE_W / 2.0f) + OFFSET_X;
+        float screenY = (obj->x + obj->y) * 10 - obj->z * 42 + OFFSET_Y;
+
+        int left   = int(screenX);
+        int right  = int(screenX + TILE_W);
+        int top    = int(screenY);
+        int bottom = int(screenY + TILE_H);
+
+        return !(right < camRect.x0 || left > camRect.x1 ||
+                 bottom < camRect.y0 || top > camRect.y1);
+    };
 
     int index = 0;
     for (auto* obj : sorted) {
-        SubTexture uv;
-        if (atlasMap.count(obj->texture)) {
-            uv = atlasMap[obj->texture];
-        } else {
-            // fallback: if texture wasn't packed (overflow), use a 1x1 transparent uv at 0,0
-            uv = SubTexture{0.0f,0.0f,1.0f,1.0f};
-        }
-        float depth = -0.000001f * float(index++); // small offset per object
+        if (!isObjectOnScreen(obj)) continue; // skip off-screen objects
+
+        SubTexture uv = atlasMap.count(obj->texture) ? atlasMap[obj->texture] : SubTexture{0,0,1,1};
+        float depth = -0.000001f * float(index++);
         appendObjectToVerts(worldVerts, obj, uv, depth);
     }
 
-    // Upload worldVerts to global VBO (one update per frame)
+    //  Upload to global VBO
     globalVAO.bind();
     globalVBO->bind();
     globalVBO->update(worldVerts.data(), worldVerts.size());
 
+    // Draw
     defaultShader.use();
-
-    // bind atlas texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, atlasTex);
-    // If your shader expects e.g. "tex" uniform, ensure it's set to 0 somewhere (once on init)
-    // defaultShader.setInt("tex", 0);
-
-    // single draw
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(worldVerts.size() / 8));
 
-    // swap
+    // Swap buffers
     SDL_GL_SwapWindow(engine->getWindow());
 }
