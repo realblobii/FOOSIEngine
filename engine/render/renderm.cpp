@@ -99,18 +99,17 @@ void renderPipeline::batchTile(TileBatch& batch, const Object* obj) {
 
     for (int i=0;i<6;i++){
         const float* v = &quadTemplate[i*8];
-        float px = screenToNDCx(int(baseX+v[0]));
-        float py = screenToNDCy(int(baseY+v[1]));
+        float px = baseX+v[0];
+        float py = baseY+v[1];
 
-        if (px >= -0.1 && py >= -0.1 && px <= 1.1 && py <= 1.1){
-        batch.verts.push_back(px);
-        batch.verts.push_back(py);
+        batch.verts.push_back(screenToNDCx(int(px)));
+        batch.verts.push_back(screenToNDCy(int(py)));
         batch.verts.push_back(0.0f);
         batch.verts.push_back(v[3]);
         batch.verts.push_back(v[4]);
         batch.verts.push_back(v[5]);
         batch.verts.push_back(v[6]);
-        batch.verts.push_back(v[7]);}
+        batch.verts.push_back(v[7]);
     }
 
     batch.dirty = true;
@@ -134,6 +133,8 @@ void renderPipeline::renderAll() {
 
     // Build batches
     for (auto* obj : sorted) {
+        if (obj->obj_class=="tile") {
+            // create batch if not exist
             if (tileBatches.count(obj->texture)==0) {
                 TileBatch batch;
                 // create persistent VBO + VAO
@@ -146,7 +147,13 @@ void renderPipeline::renderAll() {
                 tileBatches[obj->texture] = batch;
             }
             batchTile(tileBatches[obj->texture], obj);
-        
+        } else {
+            // Non-tile object
+            glTile t = obj2gl(obj);
+            defaultShader.use();
+            dVAO.bind();
+            draw(t.VBO, t.texture);
+        }
     }
 
     // Draw all tile batches
