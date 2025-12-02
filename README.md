@@ -6,16 +6,28 @@ Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FO
 ### Dependencies 
 Dependencies such as GLAD, stb_image, and LearnOpenGL's libraries are included with the repo with their respective licenses in the `/incl` directory, however, you will also need a few extra dependencies.
 ```
-SDL
-SDL2 Compats
-OpenGL
+sdl
+sdl2-compat
 jsoncpp
 cmake
+make
+gcc
 ```
 
 clone the repo with `git clone https://github.com/realblobii/FOOSIEngine/`
 
-To build it, just navigate to the FOOSIEngine directory, and firstly, run `cmake .`, then `make`, then navigate to the `game` directory and run `build/game`. This should hopefully work. Please drop an issue if you need help, I'll try to get to you.
+To build it, just navigate to the `game` directory and run the `./quickbnr.sh` script to build the engine using the code in `game/main.cpp` (the main code for any game written in the engine, boilerplate in the repo). 
+
+If you see this error:
+```
+make[1]: CMakeFiles/Makefile2: No such file or directory
+make[1]: *** No rule to make target 'CMakeFiles/Makefile2'.  Stop.
+make: *** [Makefile:104: clean] Error 2
+make[1]: CMakeFiles/Makefile2: No such file or directory
+make[1]: *** No rule to make target 'CMakeFiles/Makefile2'.  Stop.
+make: *** [Makefile:104: clean] Error 2
+```
+Ignore it, it doesn't affect anything. 
 
 ## Composition
 FOOSIE is composed of three main components: The Isometric Renderer, The Object Class System, and The Registry. These three work together along with the core engine library to create a fully-functional game world. Below is some basic information about these three components, but if you're ready to dig deeper, check out the docs (when they're done!).
