@@ -13,10 +13,21 @@ cmake
 make
 gcc
 ```
+### Quick Start
+Paste this into your terminal to download, build, and run FOOSIE for the first time:
+```
+git clone https://github.com/realblobii/FOOSIEngine/
+cd FOOSIEngine/game
+mkdir assets
+touch assets/objects.json
+./quickbnr.sh
+```
+The window will be blank for now, but no errors should show. Open an issue if you get an error and we'll sort it out. 
 
+### Installation Instructions
 clone the repo with `git clone https://github.com/realblobii/FOOSIEngine/`
 
-To build it, just navigate to the `game` directory and run the `./quickbnr.sh` script to build the engine using the code in `game/main.cpp` (the main code for any game written in the engine, boilerplate in the repo). 
+To build it, just navigate to the `game` directory and run the `./quickbnr.sh` script to build the engine using the biolerplate code in `game/main.cpp`.
 
 If you see this error:
 ```
