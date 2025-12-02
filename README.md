@@ -18,11 +18,9 @@ Paste this into your terminal to download, build, and run FOOSIE for the first t
 ```
 git clone https://github.com/realblobii/FOOSIEngine/
 cd FOOSIEngine/game
-mkdir assets
-touch assets/objects.json
 ./quickbnr.sh
 ```
-The window will be blank for now, but no errors should show. Open an issue if you get an error and we'll sort it out. 
+The window will be blank for now, and the engine will complain that it can't find `objects.json`, but no other errors should show. Open an issue if you get an error and we'll sort it out. 
 
 ### Installation Instructions
 clone the repo with `git clone https://github.com/realblobii/FOOSIEngine/`
