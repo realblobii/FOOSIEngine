@@ -19,21 +19,13 @@ FOOSIE is composed of three main components: The Isometric Renderer, The Object 
 ## The Object Class System
 FOOSIE uses an object class system to manage the properties of various in-game objects. This system acts similar to both Unity's Prefabs and Scriptable Objects.
 
-### Class and Sub-class
 Objects have a class, and a sub-class. The class is responsible for representing the actual C++ class code of the object. It includes things such as movement code and interacts with the Object Pipeline directly.
 
 The Subclass is a versatile child class for items that share similar functionality. Its main purpose is to create reproducible variants of the main class. Examples include, different tile types in a tilemap, different player skins, different food types.
 
-Subclasses for the most part aren't meant to define their own code, however, if you really need it, you can always use switch statements in the respective Object Class' code. One thing we plan to add to subclasses in the future is them determining their own variable amounts. While they won't be able to initiate new variables, they will be able to have custom amounts for some of the overarching Object Class' variables (not core engine things like coords or ID though).
-
-### Object Loader
-Generally, object classes are created in a JSON file, and defined in a header/CPP file. The JSON file mainly initiates the objects and gives things like textures or variables to sub-classes, whereas the C++ will ensure the main class will work in the engine. If you don't have a class in both JSON and C++, the Object Loader will tend to fail. We plan to automate this in future versions via commandline TUI, or a bespoke GUI.
-
 ## The Registry
-FOOSIE uses a system called the object registry. Rather than having a child-parent system, each object within FOOSIE is equal. If you wish for one object to follow another, you can `objManager::tether()` to it \[WIP]. 
+FOOSIE uses a system called the object registry. Rather than having a child-parent system, each object within FOOSIE is equal. However, they may be tethered together and objects or classes can even have their own registries due to how the engine's Object Manager works. 
 
-### Accessing the Registry
-The Registry is a child vector of the `objManager` class andsoforth can be accessed via `engine->objMgr`. If you wish to sort the registry or move it around in any other way than adding or removing objects from the world, it is advised to create a copy with it instead of using a direct pointer to avoid upsetting object logic. Nobody wants a world that won't render. 
+## The Isometric Renderer
+FOOSIE's renderer uses OpenGL to show a 3D world space using 2d tiles in an isometric perspective. Objects' subclasses will have a list textures bound to them which the code of the object can then select from and send to the renderer. FOOSIE sends all textures and objects to the renderer in one big batch called a texture atlas to greatly speed up rendering and provide a simple fix to layering tiles in world space. 
 
-### Adding/Removing objects
-So far, adding objects is as easy as `objManager::instantiate()` for your object! Though, I would recommend using Tilemaps for `tile` objects. Again, this will be updated when I add a simple registry object destroyer. Project is very WIP at the moment. 
