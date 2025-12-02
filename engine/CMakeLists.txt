@@ -22,14 +22,12 @@ target_include_directories(stb_image PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl)
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
-pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
 pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 
 target_include_directories(engine
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
         ${JSONCPP_INCLUDE_DIRS}
 )
 target_include_directories(glad
@@ -44,6 +42,5 @@ target_link_libraries(engine
         stb_image
         OpenGL::GL
         ${SDL2_LIBRARIES}
-        ${SDL2_IMAGE_LIBRARIES}
         ${JSONCPP_LIBRARIES}   # correct plural variable
 )

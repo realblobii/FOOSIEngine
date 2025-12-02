@@ -112,7 +112,6 @@ void Engine::clean() {
 
     SDL_DestroyWindow(window);
     SDL_GL_DeleteContext(glContext);
-    IMG_Quit();
     SDL_Quit();
     std::cout << "Engine Closed Successfully\n";
 }
