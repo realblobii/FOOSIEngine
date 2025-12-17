@@ -12,6 +12,7 @@
 class Tile_OBJ : public Object {
 public:
     
+    
 
     Tile_OBJ() {
         obj_class = "tile"; // set the obj_class

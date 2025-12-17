@@ -31,6 +31,7 @@ private:
         std::string obj_class;
         std::string obj_subclass;
         std::string texture;
+        Json::Value properties;
     };
 
     std::vector<ObjectData> objectDefs;

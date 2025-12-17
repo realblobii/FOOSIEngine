@@ -58,6 +58,10 @@ objManager::objManager(const std::string& objFile) {
         data.obj_class = t["obj_class"].asString();
         data.obj_subclass = t["obj_subclass"].asString();
         data.texture = t["textures"]["default"].asString();
+        // optional properties block that can set object fields (like ScriptableObjects)
+        if (t.isMember("properties")) {
+            data.properties = t["properties"];
+        }
         objectDefs.push_back(data);
     }
 }
@@ -96,7 +100,28 @@ Object* objManager::instantiate(const std::string& obj_class,
     obj->id = counter++;
     obj->texref = "default";
 
-    // Resolve texture using current texref
+    // Apply subclass properties from objects.json (overrides defaults)
+    // Enforcement: we DO NOT allow prototype JSON to set core instance
+    // placement or engine-managed fields (x,y,z,texref). If these keys
+    // are present in the properties block, emit a warning and ignore them.
+    for (const auto &d : objectDefs) {
+        if (d.obj_class == obj_class && d.obj_subclass == obj_subclass) {
+            Json::Value props = d.properties; // make a copy we can modify
+            bool warned = false;
+            if (props.isMember("x")) { props.removeMember("x"); warned = true; }
+            if (props.isMember("y")) { props.removeMember("y"); warned = true; }
+            if (props.isMember("z")) { props.removeMember("z"); warned = true; }
+            if (props.isMember("texref")) { props.removeMember("texref"); warned = true; }
+            if (warned) {
+                std::cerr << "objects.json: ignoring deprecated core fields (x,y,z,texref) "
+                          << "for prototype " << obj_class << ":" << obj_subclass << "\n";
+            }
+            obj->applyProperties(props);
+            break;
+        }
+    }
+
+    // Resolve texture using current texref (properties may have changed texref)
     obj->resolveTexture(*this);
 
     registry.push_back(std::move(obj));
