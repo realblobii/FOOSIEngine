@@ -5,12 +5,19 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          # ensure the GITHUB_TOKEN credentials are available for later push
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
