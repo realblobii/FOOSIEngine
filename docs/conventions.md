@@ -8,5 +8,3 @@
 Style notes
 - Engine uses raw pointers for ownership where the engine owns resources (e.g., `objMgr->registry` holds unique_ptr<Object>). When using `Instantiate()` you receive a raw pointer but do not free it.
 - Keep JSON keys snake_case to match existing examples (e.g., `obj_class`, `obj_subclass`).
-
-If you'd like, I can add a CONTRIBUTING.md with preferred PR and coding workflows.
