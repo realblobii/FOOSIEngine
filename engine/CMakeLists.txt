@@ -9,6 +9,7 @@ add_library(engine STATIC
     render/glAbstract.cpp
     tile/tilemap.cpp
     obj/obj_mgr.cpp
+    input/mouse.cpp
 )
 
 # Glad is its own static library

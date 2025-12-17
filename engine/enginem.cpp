@@ -45,6 +45,8 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         if (!rPipeline){
             stbi_set_flip_vertically_on_load(true);
             this->rPipeline = new renderPipeline(this);}
+        if (!mLnr){
+            this->mLnr = new mListener();}
 
 
     } else {
@@ -58,6 +60,7 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
 void Engine::handleEvents() {
     SDL_Event event;
 while (SDL_PollEvent(&event)) {
+    mLnr->listen(event);
     switch (event.type){
         case SDL_QUIT:
             isRunning = false;
@@ -69,6 +72,7 @@ void Engine::update() {
     for (auto& obj : objMgr->registry){
         obj->Update();
     }
+    Update();
 }
 
 void Engine::render() {

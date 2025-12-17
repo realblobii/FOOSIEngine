@@ -14,6 +14,7 @@
 #include "engine/tile/tilemap.h"
 #include "engine/obj/obj_mgr.h"  
 #include "game/main.h"
+#include "engine/input/mouse.h"
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
@@ -43,6 +44,7 @@ public:
     TileMap* tileMap = nullptr;     
     objManager* objMgr = nullptr; 
     renderPipeline* rPipeline = nullptr; 
+    mListener* mLnr = nullptr;
 
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
     
