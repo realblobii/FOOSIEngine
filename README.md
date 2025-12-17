@@ -1,6 +1,7 @@
 # FOOSIE
 
-[![Docs](https://img.shields.io/badge/docs-FOOSIEngine-blue)](https://realblobii.github.io/FOOSIEngine/)
+[![Docs](https://img.shields.io/badge/docs-FOOSIEngine-blue)](https://realblobii.github.io/FOOSIEngine/docs)
+
 Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FOSS) isometric game engine in C++ using SDL's input/window libraries with the OpenGL renderer, licensed under the GNU LGPL v3.0 or later. 
 
 ## Installation
