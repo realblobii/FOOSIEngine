@@ -47,6 +47,8 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
             this->rPipeline = new renderPipeline(this);}
         if (!mLnr){
             this->mLnr = new mListener();}
+        if (!kLnr){
+            this->kLnr = new kListener();}
 
 
     } else {
@@ -61,6 +63,7 @@ void Engine::handleEvents() {
     SDL_Event event;
 while (SDL_PollEvent(&event)) {
     mLnr->listen(event);
+    if (kLnr) kLnr->listen(event);
     switch (event.type){
         case SDL_QUIT:
             isRunning = false;
@@ -72,6 +75,10 @@ void Engine::update() {
     for (auto& obj : objMgr->registry){
         obj->Update();
     }
+    // tick input listeners so "hold" handlers are invoked each frame
+    if (mLnr) mLnr->tick();
+    if (kLnr) kLnr->tick();
+
     Update();
 }
 
@@ -112,6 +119,10 @@ void Engine::clean() {
     if(rPipeline){
         delete rPipeline;
         rPipeline = nullptr;
+    }
+    if (kLnr) {
+        delete kLnr;
+        kLnr = nullptr;
     }
 
     SDL_DestroyWindow(window);

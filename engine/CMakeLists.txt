@@ -10,6 +10,7 @@ add_library(engine STATIC
     tile/tilemap.cpp
     obj/obj_mgr.cpp
     input/mouse.cpp
+    input/keyboard.cpp
 )
 
 # Glad is its own static library

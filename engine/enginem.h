@@ -15,6 +15,7 @@
 #include "engine/obj/obj_mgr.h"  
 #include "game/main.h"
 #include "engine/input/mouse.h"
+#include "engine/input/keyboard.h"
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
@@ -45,6 +46,7 @@ public:
     objManager* objMgr = nullptr; 
     renderPipeline* rPipeline = nullptr; 
     mListener* mLnr = nullptr;
+    kListener* kLnr = nullptr;
 
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
     
