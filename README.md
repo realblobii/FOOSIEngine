@@ -1,4 +1,6 @@
 # FOOSIE
+
+[![Docs](https://img.shields.io/badge/docs-FOOSIEngine-blue)](https://realblobii.github.io/FOOSIEngine/)
 Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FOSS) isometric game engine in C++ using SDL's input/window libraries with the OpenGL renderer, licensed under the GNU LGPL v3.0 or later. 
 
 ## Installation
@@ -40,6 +42,8 @@ Ignore it, it doesn't affect anything.
 
 ## Composition
 FOOSIE is composed of three main components: The Isometric Renderer, The Object Class System, and The Registry. These three work together along with the core engine library to create a fully-functional game world. Below is some basic information about these three components, but if you're ready to dig deeper, check out the docs (when they're done!).
+
+For full API documentation and developer guidance see the docs: ./docs/index.md
 
 ## The Object Class System
 FOOSIE uses an object class system to manage the properties of various in-game objects. This system acts similar to both Unity's Prefabs and Scriptable Objects.

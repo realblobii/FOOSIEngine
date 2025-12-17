@@ -1,0 +1,13 @@
+site_name: FOOSIEngine Docs
+site_url: https://example.com/
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Engine: engine.md
+  - Objects: objects.md
+  - Input: input.md
+  - Render: render.md
+  - API: api.md
+  - Build: build.md
+  - Conventions: conventions.md
