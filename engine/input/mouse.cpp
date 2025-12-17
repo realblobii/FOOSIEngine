@@ -7,14 +7,19 @@ void mListener::listen(SDL_Event &event){
        switch(event.type){
            case SDL_MOUSEBUTTONDOWN:
                cClick.state = 1; 
+               cClick.down = true;
                break;
            case SDL_MOUSEBUTTONUP:
                cClick.state = 0; 
+               cClick.down = false;
                break;
        }
    }
    else{
     cClick.state = -1;
+   }
+   if (cClick.down){
+        SDL_GetMouseState(&cClick.x, &cClick.y);
    }
     // broadcast to any registered handlers (deliver a copy)
     for (auto &h : handlers) {

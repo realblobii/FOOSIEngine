@@ -12,6 +12,7 @@ class mListener{
         int y;
         int state;
         int btn;
+        bool down;
     };
 
     using ClickHandler = std::function<void(const click&)>;

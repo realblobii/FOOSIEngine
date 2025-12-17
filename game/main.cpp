@@ -12,8 +12,8 @@ int main(int argc, const char *argv[])
   // register a click handler (broadcast style) so multiple systems can listen
   if (engine->mLnr) {
     engine->mLnr->addHandler([](const mListener::click &c){
-      if (c.state == 0) {
-        std::cout << "Mouse Click at: (" << c.x << ", " << c.y << ")\n";
+      if (c.down == true) {
+        std::cout << "Mouse Held at: (" << c.x << ", " << c.y << ")\n";
       }
     });
   }
