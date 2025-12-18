@@ -18,6 +18,13 @@ public:
     std::string obj_subclass;
     std::string texref = "default";   
     std::string texture; 
+    bool invis;
+
+    std::vector<Object*>& getChildren()  { return children; }
+
+   void setParent(Object* p) { parent = p; }
+    Object* getParent() const {    return parent; }
+
 
     float x = 0.0f;
     float y = 0.0f;
@@ -75,6 +82,9 @@ public:
     virtual void Update(){}
 private:
     std::unordered_map<std::string, PropertySetter> propertySetters;
+
+    std::vector<Object*> children; // raw pointers
+    Object* parent = nullptr;
 };
 
 #endif

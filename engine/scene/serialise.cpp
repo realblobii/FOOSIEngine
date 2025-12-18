@@ -83,6 +83,7 @@ sceneData sceneManager::loadScene(const std::string& sceneFile, int baseX, int b
 
     inFile.close();
     loadedScenes[sceneFile] = sData.scene_obj_ids;
+    engine->objMgr->printTree(engine->objMgr->getRoot());
     return sData;
 }
 

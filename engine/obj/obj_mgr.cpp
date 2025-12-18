@@ -3,7 +3,32 @@
 #include <iostream>
 #include "game/objclass.h"
 
-int counter = 0;
+int counter = 1;
+
+Object* objManager::createRoot() {
+    if (root) return root; // already created
+
+    auto obj = std::make_unique<Object>();
+
+    obj->id = 0;
+    obj->obj_class = "";        // explicitly empty
+    obj->obj_subclass = "";
+    obj->texref = "";
+    obj->texture = "";
+    obj->invis = true;
+
+    obj->x = 0.0f;
+    obj->y = 0.0f;
+    obj->z = 0.0f;
+
+    // IMPORTANT: root should never resolve textures or accept properties
+    // so we simply never call those systems on it.
+
+    root = obj.get();
+    registry.insert(registry.begin(), std::move(obj)); // force index 0
+
+    return root;
+}
 
 //----------------------------------
 // Object texture management
@@ -32,9 +57,69 @@ void Object::setTex(const std::string& newRef, const objManager& mgr) {
     resolveTexture(mgr);
 }
 
+void objManager::printTree(Object* obj, const std::string& prefix, bool isLast) {
+    if (!obj) return;
+
+    std::cout << prefix;
+    if (!prefix.empty()) std::cout << (isLast ? "└─ " : "├─ ");
+
+    // Safe describe
+    try {
+        obj->describe();
+    } catch (...) {
+        std::cout << "[INVALID OBJECT]\n";
+    }
+
+    auto& children = obj->getChildren();
+    std::string childPrefix = prefix + (isLast ? "   " : "│  ");
+
+    for (size_t i = 0; i < children.size(); ++i) {
+    if (children[i]) printTree(children[i], childPrefix, i == children.size() - 1);
+    }
+
+}
+
+
+
 //----------------------------------
 // objManager
 //----------------------------------
+void objManager::addChild(Object* parent, std::unique_ptr<Object> child)
+{
+    if (!child || !parent) return; // safety check
+
+    // Detach from old parent if it had one
+    if (Object* oldParent = child->getParent()) {
+        removeChild(oldParent, child.get());
+    }
+
+    // Set new parent (non-owning reference)
+    child->setParent(parent);
+
+    // Transfer ownership to new parent
+    parent->getChildren().push_back(child.get());
+}
+
+void objManager::removeChild(Object* parent, Object* child)
+{
+    if (!parent || !child) return; // safety check
+
+    auto& siblings = parent->getChildren();
+    
+    // Remove the child from the parent's vector (unique_ptr is destroyed here)
+    siblings.erase(
+    std::remove_if(siblings.begin(), siblings.end(),
+        [&](Object* o){
+            return o == child;
+        }),
+    siblings.end()
+);
+
+
+    // Reparent to root without transferring ownership
+    child->setParent(getRoot());
+}
+
 
 objManager::objManager(const std::string& objFile) {
     std::ifstream file(objFile);
@@ -47,11 +132,14 @@ objManager::objManager(const std::string& objFile) {
     Json::CharReaderBuilder builder;
     JSONCPP_STRING errs;
 
+    createRoot();
+
     if (!Json::parseFromStream(builder, file, &root, &errs)) {
         std::cerr << "Failed to parse JSON: " << errs << "\n";
         return;
     }
 
+    
     const Json::Value objs = root["objects"];
     for (const auto& t : objs) {
         ObjectData data;
@@ -125,6 +213,12 @@ Object* objManager::instantiate(const std::string& obj_class,
     obj->resolveTexture(*this);
 
     registry.push_back(std::move(obj));
+    Object* objPtr = registry.back().get();
+    objPtr->setParent(getRoot());
+    getRoot()->getChildren().push_back(objPtr); // raw pointer, OK
+
+
+
     return registry.back().get();
 }
 

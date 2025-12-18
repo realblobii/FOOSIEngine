@@ -18,6 +18,9 @@ public:
     Object* instantiate(const std::string& obj_class,
                                 const std::string& obj_subclass,
                                 float x, float y, float z);
+    
+    Object* createRoot();
+    Object* getRoot() const { return root; }
 
     void printRegistry() const;
 
@@ -29,6 +32,13 @@ public:
     
     friend class Object;
 
+    void addChild(Object* parent, std::unique_ptr<Object> child);
+    void removeChild(Object* parent, Object* child);
+
+    void printTree(Object* obj, const std::string& prefix = "", bool isLast = true);
+
+        
+
 private:
     struct ObjectData {
         std::string obj_class;
@@ -36,7 +46,7 @@ private:
         std::string texture;
         Json::Value properties;
     };
-
+    Object* root = nullptr;
     std::vector<ObjectData> objectDefs;
 };
 
