@@ -13,11 +13,15 @@ static inline std::string trim(const std::string &s) {
 
 // extract scene name from header like: SCENE {name} {
 static inline std::string extract_scene_name(const std::string &s) {
-    auto a = s.find('{');
-    auto b = s.find('}', a==std::string::npos?0:a);
-    if (a==std::string::npos || b==std::string::npos || b<=a) return "";
-    return trim(s.substr(a+1, b-a-1));
+    const std::string keyword = "SCENE";
+    auto pos = s.find(keyword);
+    if (pos == std::string::npos)
+        return "";
+
+    // Everything after "SCENE"
+    return trim(s.substr(pos + keyword.size()));
 }
+
 
 sceneData sceneManager::loadScene(const std::string& sceneFile, int baseX, int baseY, int baseZ){
     sceneData sData;
