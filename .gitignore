@@ -53,6 +53,10 @@ CMakeUserPresets.json
 # debug information files
 *.dwo
 
+##Ninja build files
+build.ninja
+.ninja_deps
+.ninja_log
 
 # --- FOOSIE SPECIFIC IGNORES ---
 game/assets/

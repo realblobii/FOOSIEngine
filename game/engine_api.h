@@ -2,6 +2,7 @@
 
 #include "engine/enginem.h"
 #include "engine/obj/obj.h"
+#include "engine/scene/serialise.h"
 #include <string>
 
 // Lightweight script-facing API that wraps Engine methods. This file does
@@ -27,4 +28,9 @@ static inline void loadTilemap(const std::string &jsonFile, int tileWidth, int t
 static inline std::vector<int> loadTilemapIds(const std::string &jsonFile, int offsetX, int offsetY, int offsetZ) {
     if (!engine) return {};
     return engine->loadTileMapReturnIds(jsonFile, offsetX, offsetY, offsetZ);
+}
+
+static inline sceneData loadScene(const std::string &sceneFile, int baseX=0, int baseY=0, int baseZ=0) {
+    if (!engine || !engine->sceneMgr) return sceneData{};
+    return engine->sceneMgr->loadScene(sceneFile, baseX, baseY, baseZ);
 }
