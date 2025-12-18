@@ -18,7 +18,13 @@ static inline Object* Instantiate(const std::string &obj_class,
 }
 
 // Load a tile map using the engine helper. Convenience wrapper.
-static inline void LoadTileMap(const std::string &jsonFile, int tileWidth, int tileHeight) {
+static inline void loadTilemap(const std::string &jsonFile, int tileWidth, int tileHeight) {
     if (!engine) return;
     engine->loadTileMap(jsonFile, tileWidth, tileHeight);
+}
+
+// Convenience wrapper that loads a tilemap and returns instantiated object ids (offset applied)
+static inline std::vector<int> loadTilemapIds(const std::string &jsonFile, int offsetX, int offsetY, int offsetZ) {
+    if (!engine) return {};
+    return engine->loadTileMapReturnIds(jsonFile, offsetX, offsetY, offsetZ);
 }

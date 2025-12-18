@@ -127,3 +127,12 @@ Object* objManager::instantiate(const std::string& obj_class,
     registry.push_back(std::move(obj));
     return registry.back().get();
 }
+
+void objManager::removeObjectsById(const std::vector<int>& ids) {
+    if (ids.empty()) return;
+    registry.erase(std::remove_if(registry.begin(), registry.end(), [&](const std::unique_ptr<Object>& o){
+        if (!o) return false;
+        return std::find(ids.begin(), ids.end(), o->id) != ids.end();
+    }), registry.end());
+}
+

@@ -1,0 +1,26 @@
+{
+    "objects": [
+        {
+            "obj_class": "tile",
+            "obj_subclass": "grass",
+            "textures": {
+                "default": "demo/grass.png"
+            }
+        },
+        {
+            "obj_class": "tile",
+            "obj_subclass": "half_grass",
+            "textures": {
+                "default": "demo/half-grass.png"
+            }
+        },
+        {
+            "obj_class": "tile",
+            "obj_subclass": "pTest",
+            "textures": {
+                "default": "demo/player.png"
+            }
+        }
+        
+    ]
+}

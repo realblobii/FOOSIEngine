@@ -11,6 +11,7 @@ add_library(engine STATIC
     obj/obj_mgr.cpp
     input/mouse.cpp
     input/keyboard.cpp
+    scene/serialise.cpp
 )
 
 # Glad is its own static library

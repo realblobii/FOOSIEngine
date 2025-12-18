@@ -16,6 +16,7 @@
 #include "game/main.h"
 #include "engine/input/mouse.h"
 #include "engine/input/keyboard.h"
+#include "engine/scene/serialise.h" 
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
@@ -48,7 +49,13 @@ public:
     mListener* mLnr = nullptr;
     kListener* kLnr = nullptr;
 
+    // Scene manager for loading/unloading textual scenes
+    sceneManager* sceneMgr = nullptr;
+
     void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
+
+    // Load a tilemap and return the instantiated object ids; offsets are applied to each tile
+    std::vector<int> loadTileMapReturnIds(const std::string& jsonFile, int offsetX, int offsetY, int offsetZ);
     
     int sdl_sx, sdl_sy;
 

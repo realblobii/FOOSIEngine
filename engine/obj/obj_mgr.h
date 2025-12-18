@@ -21,6 +21,9 @@ public:
 
     void printRegistry() const;
 
+    // Remove objects by id (used by scene unloading)
+    void removeObjectsById(const std::vector<int>& ids);
+
     // Registry of live objects
     std::vector<std::unique_ptr<Object>> registry;
     

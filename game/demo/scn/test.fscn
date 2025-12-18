@@ -1,0 +1,4 @@
+SCENE test{
+    OBJECT tile.grass 10 10 0;
+    OBJECT tile.pTest 10 10 1;
+}
