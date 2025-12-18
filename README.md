@@ -20,31 +20,23 @@ gcc
 Paste this into your terminal to download, build, and run FOOSIE for the first time:
 ```
 git clone https://github.com/realblobii/FOOSIEngine/
-cd FOOSIEngine/game
-./quickbnr.sh
+cd FOOSIEngine
+./quickbnr.sh --gmake
 ```
-The window will be blank for now, and the engine will complain that it can't find `objects.json`, but no other errors should show. Open an issue if you get an error and we'll sort it out. 
+No errors should show. Open an issue if you get an error and we'll sort it out. 
 
-### Installation Instructions
-clone the repo with `git clone https://github.com/realblobii/FOOSIEngine/`
+### Other build options
 
-To build it, just navigate to the `game` directory and run the `./quickbnr.sh` script to build the engine using the biolerplate code in `game/main.cpp`.
+To use `ninja` instead of GNU Make:
+`./quickbnr.sh --ninja`
 
-If you see this error:
-```
-make[1]: CMakeFiles/Makefile2: No such file or directory
-make[1]: *** No rule to make target 'CMakeFiles/Makefile2'.  Stop.
-make: *** [Makefile:104: clean] Error 2
-make[1]: CMakeFiles/Makefile2: No such file or directory
-make[1]: *** No rule to make target 'CMakeFiles/Makefile2'.  Stop.
-make: *** [Makefile:104: clean] Error 2
-```
-Ignore it, it doesn't affect anything. 
+To clean the CMake cache before building:
+`./quickbnr.sh --ninja --clean` or `./quickbnr.sh --gmake --clean` (depending on chosen build system). 
 
 ## Composition
 FOOSIE is composed of three main components: The Isometric Renderer, The Object Class System, and The Registry. These three work together along with the core engine library to create a fully-functional game world. Below is some basic information about these three components, but if you're ready to dig deeper, check out the docs (when they're done!).
 
-For full API documentation and developer guidance see the docs: ./docs/index.md
+For full API documentation and developer guidance see the [docs](https://realblobii.github.io/FOOSIEngine).
 
 ## The Object Class System
 FOOSIE uses an object class system to manage the properties of various in-game objects. This system acts similar to both Unity's Prefabs and Scriptable Objects.
