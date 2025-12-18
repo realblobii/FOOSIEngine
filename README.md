@@ -54,7 +54,7 @@ Objects have a class, and a sub-class. The class is responsible for representing
 The Subclass is a versatile child class for items that share similar functionality. Its main purpose is to create reproducible variants of the main class. Examples include, different tile types in a tilemap, different player skins, different food types.
 
 ## The Registry
-FOOSIE uses a system called the object registry. Rather than having a child-parent system, each object within FOOSIE is equal. However, they may be tethered together and objects or classes can even have their own registries due to how the engine's Object Manager works. 
+FOOSIE uses a system called the object registry. It's literally just a fancy way of saying a hierarchy. 
 
 ## The Isometric Renderer
 FOOSIE's renderer uses OpenGL to show a 3D world space using 2d tiles in an isometric perspective. Objects' subclasses will have a list textures bound to them which the code of the object can then select from and send to the renderer. FOOSIE sends all textures and objects to the renderer in one big batch called a texture atlas to greatly speed up rendering and provide a simple fix to layering tiles in world space. 
