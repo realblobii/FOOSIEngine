@@ -11,7 +11,6 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include "engine/render/texture.h"
-#include "engine/tile/tilemap.h"
 #include "engine/obj/obj_mgr.h"  
 #include "game/main.h"
 #include "engine/input/mouse.h"
@@ -42,8 +41,7 @@ public:
  */
     bool running() { return isRunning; }
     SDL_Window* getWindow() { return window; }
-
-    TileMap* tileMap = nullptr;     
+    
     objManager* objMgr = nullptr; 
     renderPipeline* rPipeline = nullptr; 
     mListener* mLnr = nullptr;
@@ -52,10 +50,6 @@ public:
     // Scene manager for loading/unloading textual scenes
     sceneManager* sceneMgr = nullptr;
 
-    void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight);
-
-    // Load a tilemap and return the instantiated object ids; offsets are applied to each tile
-    std::vector<int> loadTileMapReturnIds(const std::string& jsonFile, int offsetX, int offsetY, int offsetZ);
     
     int sdl_sx, sdl_sy;
 

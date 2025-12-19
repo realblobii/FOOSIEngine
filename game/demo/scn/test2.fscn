@@ -1,9 +1,5 @@
 SCENE test2 
 {
-    OBJECT tile.grass 0 0 0;
-    OBJECT tile.grass 0 1 0;
-    OBJECT tile.grass 1 0 0;
-    OBJECT tile.grass 1 1 0;
     OBJECT tile.pTest 1 1 1;
 
 }

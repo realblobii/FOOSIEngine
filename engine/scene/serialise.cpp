@@ -2,6 +2,7 @@
 #include "game/engine_api.h"
 #include "game/main.h"
 #include "engine/scene/scene_oclass.h"
+#include "engine/tile/tmap_oclass.h"
 #include <sstream>
 #include <memory>
 #include <stdexcept>
@@ -111,42 +112,7 @@ sceneData sceneManager::loadScene(
             sData.scene_obj_ids.push_back(obj->id);
         }
 
-        // ───────── TILEMAP ─────────
-        else if (cmd == "TILEMAP") {
-            std::string path;
-            int x = 0, y = 0, z = 0;
-
-            if (!(iss >> path >> x >> y >> z))
-                continue;
-
-            auto ids = loadTilemapIds(
-                sFolder + "/" + path,
-                x + baseX,
-                y + baseY,
-                z + baseZ
-            );
-
-            for (int id : ids) {
-                Object* tileObj = nullptr;
-
-                for (auto& objPtr : engine->objMgr->registry) {
-                    if (objPtr && objPtr->id == id) {
-                        tileObj = objPtr.get();
-                        break;
-                    }
-                }
-
-                if (tileObj) {
-                    engine->objMgr->addChild(scnObj, tileObj);
-                }
-            }
-
-            sData.scene_obj_ids.insert(
-                sData.scene_obj_ids.end(),
-                ids.begin(),
-                ids.end()
-            );
-        }
+       
 
         // ───────── NESTED SCENE ─────────
         else if (cmd == "SCENE") {

@@ -7,7 +7,6 @@ add_library(engine STATIC
     render/texture.cpp
     render/renderm.cpp
     render/glAbstract.cpp
-    tile/tilemap.cpp
     obj/obj_mgr.cpp
     input/mouse.cpp
     input/keyboard.cpp

@@ -96,59 +96,9 @@ void Engine::render() {
 
 
 
-void Engine::loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight) {
-    if (tileMap) {
-        delete tileMap;
-    }
-    tileMap = new TileMap(this, jsonFile, tileWidth, tileHeight);
-}
-
-std::vector<int> Engine::loadTileMapReturnIds(const std::string& jsonFile, int offsetX, int offsetY, int offsetZ) {
-    std::vector<int> ids;
-    std::ifstream file(jsonFile);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open JSON file: " << jsonFile << "\n";
-        return ids;
-    }
-
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    JSONCPP_STRING errs;
-
-    if (!Json::parseFromStream(builder, file, &root, &errs)) {
-        std::cerr << "Failed to parse JSON: " << errs << "\n";
-        return ids;
-    }
-
-    const Json::Value tileArray = root["tiles"];
-    for (const auto& t : tileArray) {
-        std::string obj_subclass = t["obj_subclass"].asString();
-        int x = t["x"].asInt();
-        int y = t["y"].asInt();
-        int z = t["z"].asInt();
-
-        Object* p = objMgr->instantiate("tile", obj_subclass, x + offsetX, y + offsetY, z + offsetZ);
-        if (p) ids.push_back(p->id);
-    }
-
-    return ids;
-}
-
-
-
-
 
 void Engine::clean() {
-  /* for (auto& tex : textures){
-    delete tex;
-    textures.clear();
-    } */
-
-    if (tileMap) {
-        delete tileMap;
-        tileMap = nullptr;
-    }
-
+ 
     if (objMgr) {
         delete objMgr;
         objMgr = nullptr;

@@ -27,6 +27,13 @@
             "textures": {
                 "default": ""
             }
+        },
+        {
+            "obj_class": "tmap",
+            "obj_subclass": "",
+            "textures": {
+                "default": ""
+            }
         }
         
     ]
