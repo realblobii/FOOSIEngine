@@ -33,12 +33,16 @@ public:
 
     // Describe for debug
     virtual void describe() const {
+        if (id != 0){
         std::cout << "OBJECT ID " << id
                   << " CLASS " << obj_class << ":" << obj_subclass
                   << " TEXREF " << texref
                   << " TEXTURE " << texture
                   << " COORDS (" << x << ", " << y << ", " << z << ")\n";
     }
+    else{
+        std::cout << "ROOT ID 0\n";
+    }}
 
     
     virtual void resolveTexture(const objManager& mgr);
