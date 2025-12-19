@@ -217,7 +217,7 @@ void renderPipeline::renderAll() {
     for (auto &objPtr : *registry) {
         if (!objPtr) continue;
         const std::string &path = objPtr->texture;
-        if(objPtr->id != 0){
+        if(objPtr->id != 0 && objPtr->texture != "") {
         if (!ensureImageLoaded(path) ) {
             std::cerr << "renderPipeline: warning: missing texture: " << path << std::endl;
         }}
@@ -232,7 +232,7 @@ void renderPipeline::renderAll() {
 
     //  Sort objects in isometric order
     std::vector<Object*> sorted;
-    for (auto& obj : *registry) if (obj && obj->id != 0) sorted.push_back(obj.get());
+    for (auto& obj : *registry) if (obj && obj->id != 0 && obj->texture != "") sorted.push_back(obj.get());
     std::sort(sorted.begin(), sorted.end(), [](Object* a, Object* b){
         if (a->z != b->z) return a->z < b->z;
         if (a->y != b->y) return a->y < b->y;

@@ -84,42 +84,31 @@ void objManager::printTree(Object* obj, const std::string& prefix, bool isLast) 
 //----------------------------------
 // objManager
 //----------------------------------
-void objManager::addChild(Object* parent, std::unique_ptr<Object> child)
+void objManager::addChild(Object* parent, Object* child)
 {
-    if (!child || !parent) return; // safety check
+    if (!parent || !child) return;
 
-    // Detach from old parent if it had one
+    // Detach from old parent if needed
     if (Object* oldParent = child->getParent()) {
-        removeChild(oldParent, child.get());
+        removeChild(oldParent, child);
     }
 
-    // Set new parent (non-owning reference)
+    // Set new parent (non-owning)
     child->setParent(parent);
 
-    // Transfer ownership to new parent
-    parent->getChildren().push_back(child.get());
+    // Store non-owning reference
+    parent->getChildren().push_back(child);
 }
-
 void objManager::removeChild(Object* parent, Object* child)
 {
-    if (!parent || !child) return; // safety check
+    if (!parent || !child) return;
 
     auto& siblings = parent->getChildren();
-    
-    // Remove the child from the parent's vector (unique_ptr is destroyed here)
-    siblings.erase(
-    std::remove_if(siblings.begin(), siblings.end(),
-        [&](Object* o){
-            return o == child;
-        }),
-    siblings.end()
-);
+    siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
 
-
-    // Reparent to root without transferring ownership
-    child->setParent(getRoot());
+    // Clear parent reference
+    child->setParent(nullptr);
 }
-
 
 objManager::objManager(const std::string& objFile) {
     std::ifstream file(objFile);

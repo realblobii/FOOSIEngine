@@ -32,7 +32,8 @@ public:
     
     friend class Object;
 
-    void addChild(Object* parent, std::unique_ptr<Object> child);
+    // obj_mgr.h
+    void addChild(Object* parent, Object* child);
     void removeChild(Object* parent, Object* child);
 
     void printTree(Object* obj, const std::string& prefix = "", bool isLast = true);
