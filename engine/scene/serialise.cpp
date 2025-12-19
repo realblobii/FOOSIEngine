@@ -2,7 +2,6 @@
 #include "game/engine_api.h"
 #include "game/main.h"
 #include "engine/scene/scene_oclass.h"
-#include "engine/tile/tmap_oclass.h"
 #include <sstream>
 #include <memory>
 #include <stdexcept>

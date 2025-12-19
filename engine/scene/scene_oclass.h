@@ -15,7 +15,8 @@ public:
     void describe() const {
         std::cout << "OBJECT ID " << id
                   << " CLASS " << obj_class << "." << scnName
-                  << " COORDS (" << x << ", " << y << ", " << z << ")\n";
+                  << " GLOBAL COORDS (" << x << ", " << y << ", " << z << ")"
+                  << " LOCAL COORDS (" << lx << ", " << ly << ", " << lz << ")\n";
     }
     bool invis = true;
     std::string scnName; 

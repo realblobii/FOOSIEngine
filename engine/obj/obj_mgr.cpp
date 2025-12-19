@@ -92,7 +92,9 @@ void objManager::addChild(Object* parent, Object* child)
     if (Object* oldParent = child->getParent()) {
         removeChild(oldParent, child);
     }
-
+    child->lx = child->x - parent->x;
+    child->ly = child->y - parent->y;
+    child->lz = child->z - parent->z;
     // Set new parent (non-owning)
     child->setParent(parent);
 
@@ -105,7 +107,9 @@ void objManager::removeChild(Object* parent, Object* child)
 
     auto& siblings = parent->getChildren();
     siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
-
+    child->lx = 0.0f;
+    child->ly = 0.0f;
+    child->lz = 0.0f;
     // Clear parent reference
     child->setParent(nullptr);
 }

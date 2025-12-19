@@ -80,6 +80,12 @@ while (SDL_PollEvent(&event)) {
 void Engine::update() {
     for (auto& obj : objMgr->registry){
         obj->Update();
+
+        if (!obj->getParent()) continue; // root or detached object
+        
+        obj->x = obj->getParent()->x + obj->lx;
+        obj->y = obj->getParent()->y + obj->ly;
+        obj->z = obj->getParent()->z + obj->lz;
     }
     // tick input listeners so "hold" handlers are invoked each frame
     if (mLnr) mLnr->tick();
