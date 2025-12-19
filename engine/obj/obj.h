@@ -35,7 +35,7 @@ public:
     virtual void describe() const {
         if (id != 0){
         std::cout << "OBJECT ID " << id
-                  << " CLASS " << obj_class << ":" << obj_subclass
+                  << " CLASS " << obj_class << "." << obj_subclass
                   << " TEXREF " << texref
                   << " TEXTURE " << texture
                   << " COORDS (" << x << ", " << y << ", " << z << ")\n";

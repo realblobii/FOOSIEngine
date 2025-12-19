@@ -14,7 +14,7 @@ public:
     
     void describe() const {
         std::cout << "OBJECT ID " << id
-                  << " CLASS " << obj_class << ":" << scnName
+                  << " CLASS " << obj_class << "." << scnName
                   << " COORDS (" << x << ", " << y << ", " << z << ")\n";
     }
     bool invis = true;
