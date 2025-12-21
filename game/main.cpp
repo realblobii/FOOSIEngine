@@ -8,7 +8,7 @@ Engine *engine = nullptr;
 int main(int argc, const char *argv[])
 {
   engine = new Engine{};
-  engine->Init("New Game", 1920, 1080, true);
+  engine->Init("New Game", 840, 480, true);
 
   // create simple test scene files and run load/unload
 

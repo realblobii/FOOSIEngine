@@ -52,6 +52,8 @@ public:
 
     
     int sdl_sx, sdl_sy;
+    // logical (virtual) render resolution used for layout and projection
+    int virt_sx, virt_sy;
 
 
 

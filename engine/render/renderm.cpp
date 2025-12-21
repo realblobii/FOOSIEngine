@@ -45,10 +45,12 @@ renderPipeline::~renderPipeline() {
 }
 
 float renderPipeline::screenToNDCx(int screenX) {
-    return (2.0f * float(screenX) / float(engine->sdl_sx)) - 1.0f;
+    // screenX is in virtual/logical pixels; convert to NDC using virtual width
+    return (2.0f * float(screenX) / float(engine->virt_sx)) - 1.0f;
 }
 float renderPipeline::screenToNDCy(int screenY) {
-    return 1.0f - (2.0f * float(screenY) / float(engine->sdl_sy));
+    // screenY is in virtual/logical pixels; convert to NDC using virtual height
+    return 1.0f - (2.0f * float(screenY) / float(engine->virt_sy));
 }
 
 // Ensure image is loaded into rawImages (RGBA)
@@ -174,8 +176,8 @@ void renderPipeline::rebuildAtlas() {
 void renderPipeline::appendObjectToVerts(std::vector<float>& verts, const Object* obj, const SubTexture& uv, float zdepth) {
     const int TILE_W = 64;
     const int TILE_H = 64;
-    const int OFFSET_X = engine->sdl_sx/2;
-    const int OFFSET_Y = engine->sdl_sy/2;
+    const int OFFSET_X = engine->virt_sx/2;
+    const int OFFSET_Y = engine->virt_sy/2;
 
     float screenXf = (obj->x - obj->y) * (TILE_W/2.0f) + OFFSET_X;
     float screenYf = (obj->x + obj->y) * 10 - obj->z * 42 + OFFSET_Y;
@@ -211,7 +213,7 @@ void renderPipeline::renderAll() {
     struct CameraRect {
         int x0, y0, x1, y1;
     };
-    CameraRect camRect{ 0, 0, engine->sdl_sx, engine->sdl_sy };
+    CameraRect camRect{ 0, 0, engine->virt_sx, engine->virt_sy };
 
     //  Ensure all textures used by objects are loaded
     for (auto &objPtr : *registry) {
@@ -246,8 +248,8 @@ void renderPipeline::renderAll() {
     auto isObjectOnScreen = [&](const Object* obj) {
         const int TILE_W = 64;
         const int TILE_H = 64;
-        const int OFFSET_X = engine->sdl_sx / 2;
-        const int OFFSET_Y = engine->sdl_sy / 2;
+        const int OFFSET_X = engine->virt_sx / 2;
+        const int OFFSET_Y = engine->virt_sy / 2;
 
         float screenX = (obj->x - obj->y) * (TILE_W / 2.0f) + OFFSET_X;
         float screenY = (obj->x + obj->y) * 10 - obj->z * 42 + OFFSET_Y;

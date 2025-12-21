@@ -8,7 +8,7 @@ Engine::~Engine() {}
 
 void Engine::Init(const char* title, int w, int h, bool fullscreen) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-        int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN;
+        int flags = fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_SHOWN;
 
         std::cout << "SDL Successfully Initialised!" << std::endl;
 
@@ -18,8 +18,8 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); 
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-       window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
-                          SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
+                 SDL_WINDOW_OPENGL | flags | SDL_WINDOW_ALLOW_HIGHDPI);
 
         if (window) {
             std::cout << "Window Creation Success!" << std::endl;
@@ -38,8 +38,15 @@ void Engine::Init(const char* title, int w, int h, bool fullscreen) {
 
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << "\n";
 
-        sdl_sx = w;
-        sdl_sy = h;
+        // query actual GL drawable size (handles high-DPI and fullscreen-desktop)
+        int actual_w = w, actual_h = h;
+        SDL_GL_GetDrawableSize(window, &actual_w, &actual_h);
+        sdl_sx = actual_w;
+        sdl_sy = actual_h;
+        // store requested logical resolution so renderer can scale/stretch to framebuffer
+        this->virt_sx = w;
+        this->virt_sy = h;
+        glViewport(0, 0, sdl_sx, sdl_sy);
 
         
         if (!objMgr) {this->objMgr = new objManager("demo/objects.json");}
