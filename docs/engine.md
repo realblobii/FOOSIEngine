@@ -3,7 +3,7 @@
 Location: `engine/enginem.h`, `engine/enginem.cpp`
 
 What it is
-- `Engine` is the runtime owner for the window, GL context, input listeners, object manager, render pipeline and tilemap.
+- `Engine` is the runtime owner for the window, GL context, input listeners, object manager, and render pipeline.
 
 Important functions
 - `Init(const char* title, int w, int h, bool fullscreen)` — Boot the engine, create subsystems, set GL attributes.

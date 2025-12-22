@@ -14,6 +14,9 @@ Location: `engine/obj/*`, `game/assets/objects.json`
 ## Prototype `properties`
 - `game/assets/objects.json` may include a `properties` object per prototype.
 - **Important**: core engine-managed fields (`x`,`y`,`z`,`texref`) are ignored when set in prototypes. The engine will emit a warning and strip them.
+
+### Engine validation
+- The engine requires that any `OBJECT` referenced in scene files corresponds to a prototype present in `game/assets/objects.json` (i.e. valid `obj_class` and `obj_subclass`). If a prototype is missing, `Instantiate()` will return `nullptr` and the loader will skip the entry. Ensure your scene files only reference defined subclasses (for example: `tile.grass`, `tile.half_grass`, `tile.pTest`).
 - To expose prototype-driven variables, classes must register named property setters:
   - In a class constructor, call `registerFloatProperty("speed", speed);` or `registerStringProperty("team", teamName);`
   - For custom parsing, use `registerProperty("loot", [this](const Json::Value &v){ /* parse */ });`
