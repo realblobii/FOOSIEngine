@@ -2,6 +2,21 @@ site_name: FOOSIEngine Docs
 site_url: https://realblobii.github.io/FOOSIEngine
 theme:
   name: material
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.instant
 nav:
   - Home: index.md
   - Engine: engine.md
