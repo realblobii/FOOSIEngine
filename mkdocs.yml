@@ -23,6 +23,6 @@ nav:
   - Objects: objects.md
   - Input: input.md
   - Render: render.md
-  - API: api.md
+  - API: ENGINE_FUNCTIONS.md
   - Build: build.md
   - Conventions: conventions.md

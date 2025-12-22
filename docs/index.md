@@ -8,7 +8,7 @@ Welcome — this is the docs hub for FOOSIEngine. Use the links below to jump to
 - [Scene file format & Scene manager](scene.md)
 - [Input listeners (mouse & keyboard)](input.md)
 - [Render pipeline](render.md)
-- [Game-side helpers (engine_api)](api.md)
+- [Game-side helpers (engine_api)](ENGINE_FUNCTIONS.md)
 - [Build, run and debugging notes](build.md)
 - [Project conventions & patterns](conventions.md)
 
