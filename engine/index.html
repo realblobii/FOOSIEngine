@@ -493,7 +493,7 @@
 <p>What it is
 - <code>Engine</code> is the runtime owner for the window, GL context, input listeners, object manager, and render pipeline.</p>
 <p>Important functions
-- <code>Init(const char* title, int w, int h, bool fullscreen)</code> — Boot the engine, create subsystems, set GL attributes.
+- <code>Init(const char* cfgPath = "foosiecfg.json")</code> — Boot the engine, create subsystems, set GL attributes, and read configuration from the JSON file in the working directory (see <code>game/foosiecfg.json</code> for options). Key config options include <code>virt_sx</code>, <code>virt_sy</code>, <code>fullscreen</code>, <code>tile_width</code>, <code>tile_height</code>, <code>atlas_size</code>, <code>scene_folder</code> (folder where <code>.fscn</code> scene files live), and <code>object_files</code> (array of prototype JSON files to load in addition to the always-loaded <code>engine/coreclass.json</code>).
 - <code>handleEvents()</code> — Polls SDL events and forwards to input listeners. Handles <code>SDL_QUIT</code>.
 - <code>update()</code> — Calls each registry object's <code>Update()</code>, ticks input listeners (hold handlers), and calls the global <code>Update()</code> hook (game-provided). Should be called once per frame.
 - <code>render()</code> — Runs <code>rPipeline-&gt;renderAll()</code> to draw the frame.
