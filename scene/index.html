@@ -8,26 +8,24 @@
       
       
       
-        <link rel="canonical" href="https://realblobii.github.io/FOOSIEngine/">
+        <link rel="canonical" href="https://realblobii.github.io/FOOSIEngine/scene/">
       
       
-      
-        <link rel="next" href="engine/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>FOOSIEngine Docs</title>
+        <title>Scene file format & Scene manager - FOOSIEngine Docs</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -46,7 +44,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -64,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#foosiengine-documentation" class="md-skip">
+        <a href="#scene-file-format-scene-manager" class="md-skip">
           Skip to content
         </a>
       
@@ -80,7 +78,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="FOOSIEngine Docs" class="md-header__button md-logo" aria-label="FOOSIEngine Docs" data-md-component="logo">
+    <a href=".." title="FOOSIEngine Docs" class="md-header__button md-logo" aria-label="FOOSIEngine Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -100,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Scene file format &amp; Scene manager
             
           </span>
         </div>
@@ -178,7 +176,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="FOOSIEngine Docs" class="md-nav__button md-logo" aria-label="FOOSIEngine Docs" data-md-component="logo">
+    <a href=".." title="FOOSIEngine Docs" class="md-nav__button md-logo" aria-label="FOOSIEngine Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -193,19 +191,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -221,7 +210,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -233,7 +221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="engine/" class="md-nav__link">
+      <a href="../engine/" class="md-nav__link">
         
   
   
@@ -260,7 +248,7 @@
   
   
     <li class="md-nav__item">
-      <a href="objects/" class="md-nav__link">
+      <a href="../objects/" class="md-nav__link">
         
   
   
@@ -287,7 +275,7 @@
   
   
     <li class="md-nav__item">
-      <a href="input/" class="md-nav__link">
+      <a href="../input/" class="md-nav__link">
         
   
   
@@ -314,7 +302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="render/" class="md-nav__link">
+      <a href="../render/" class="md-nav__link">
         
   
   
@@ -341,7 +329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api.md" class="md-nav__link">
+      <a href="../api.md" class="md-nav__link">
         
   
   
@@ -368,7 +356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="build/" class="md-nav__link">
+      <a href="../build/" class="md-nav__link">
         
   
   
@@ -395,7 +383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="conventions/" class="md-nav__link">
+      <a href="../conventions/" class="md-nav__link">
         
   
   
@@ -435,6 +423,97 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#file-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syntax-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Syntax rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#child-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Child blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saving-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes &amp; constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -450,20 +529,84 @@
 
 
 
-<h1 id="foosiengine-documentation">FOOSIEngine Documentation</h1>
-<p>Welcome — this is the docs hub for FOOSIEngine. Use the links below to jump to focused pages for each subsystem.</p>
+<h1 id="scene-file-format-scene-manager">Scene file format &amp; Scene manager</h1>
+<p>Location: <code>engine/scene/*</code> and <code>game/demo/scn/*</code></p>
+<p>This page documents the textual scene format and the <code>sceneManager</code> API used to load and save scenes.</p>
+<h2 id="file-layout">File layout</h2>
+<p>A scene file uses a simple line-oriented format with a header and footer:</p>
 <ul>
-<li><a href="engine/">Engine overview and lifecycle</a></li>
-<li><a href="beginner/">Beginner guide</a></li>
-<li><a href="objects/">Object system &amp; prototypes</a></li>
-<li><a href="scene/">Scene file format &amp; Scene manager</a></li>
-<li><a href="input/">Input listeners (mouse &amp; keyboard)</a></li>
-<li><a href="render/">Render pipeline</a></li>
-<li><a href="api.md">Game-side helpers (engine_api)</a></li>
-<li><a href="build/">Build, run and debugging notes</a></li>
-<li><a href="conventions/">Project conventions &amp; patterns</a></li>
+<li>Header: <code>#SCNDEF &lt;scene-name&gt;</code> where <code>&lt;scene-name&gt;</code> is a short identifier (no <code>.fscn</code> suffix required in the header)</li>
+<li>Body: one or more <code>OBJECT</code> and <code>SCENE</code> statements and optional nested blocks</li>
+<li>Footer: <code>#ENDSCN</code></li>
 </ul>
-<p>If you're new, start with the Engine overview then read the Object system page.</p>
+<p>Example (short):</p>
+<pre><code>#SCNDEF test
+{
+    OBJECT tile.grass 10 10 0;
+    OBJECT tile.pTest 10 10 1
+    {
+        OBJECT tile.grass 0 0 1;
+    };
+    SCENE test2.fscn 11 11 0;
+};
+#ENDSCN
+</code></pre>
+<h2 id="syntax-rules">Syntax rules</h2>
+<ul>
+<li>Lines are trimmed and empty lines ignored.</li>
+<li>Commands use an initial keyword and arguments separated by whitespace.</li>
+<li>Commands include:</li>
+<li><code>OBJECT &lt;class&gt;[.&lt;subclass&gt;] &lt;x&gt; &lt;y&gt; &lt;z&gt;</code> — instantiate an object at the integer coordinates.<ul>
+<li>If the line ends with <code>;</code> it is a leaf object. If the line is followed by a <code>{</code> block, the following objects become children of this object (see <em>Child blocks</em> below).</li>
+</ul>
+</li>
+<li><code>SCENE &lt;path&gt; &lt;x&gt; &lt;y&gt; &lt;z&gt;</code> — create a reference to another scene file. The <code>path</code> should be a valid scene filename (e.g., <code>test2.fscn</code>). When loading, <code>SCENE</code> will load the referenced scene and attach its scene object as a child.</li>
+</ul>
+<h3 id="child-blocks">Child blocks</h3>
+<ul>
+<li>You can nest objects by placing a <code>{</code> on its own line after an <code>OBJECT</code> line, then placing child <code>OBJECT</code> or <code>SCENE</code> lines inside the block, and terminate the block with <code>};</code> (the close brace optionally followed by <code>;</code>).</li>
+<li>If an <code>OBJECT</code> is not followed by a <code>{</code> it is treated as a leaf and must end with <code>;</code>.</li>
+<li>Example multi-level nesting:</li>
+</ul>
+<pre><code>OBJECT tile.parent 10 10 0
+{
+    OBJECT tile.child 1 1 1;
+    OBJECT tile.withgrand 2 2 1
+    {
+        OBJECT tile.grandchild 0 1 0;
+    };
+};
+</code></pre>
+<ul>
+<li>If a closing brace includes a trailing <code>;</code> (i.e., <code>};</code>) it not only closes the block, but terminates the <em>most recent</em> object so subsequent sibling blocks are not nested under it.</li>
+</ul>
+<h2 id="loading-behavior">Loading behavior</h2>
+<ul>
+<li><code>sceneManager::loadScene(path, baseX, baseY, baseZ)</code> reads the specified file from the configured scene folder and instantiates objects.</li>
+<li>The loader maintains a stack of parent objects to support nested <code>{}</code> blocks; if no previous object exists for a <code>{</code> it treats the scene root as the parent for that block.</li>
+<li>Nested <code>SCENE</code> references are loaded recursively; the nested scene's root object is attached to the parent, and all object IDs from the nested load are aggregated into the calling scene's <code>sceneData</code>.</li>
+<li>All instantiated coordinates are the sum of the explicit coordinates and the <code>baseX</code>, <code>baseY</code>, <code>baseZ</code> offsets passed to <code>loadScene</code>.</li>
+</ul>
+<h2 id="saving-behavior">Saving behavior</h2>
+<ul>
+<li><code>sceneManager::saveScene(name)</code> serializes a scene back to a <code>.fscn</code> file in the scene folder.</li>
+<li>Behavior details:</li>
+<li>If the scene folder does not exist it is created automatically.</li>
+<li>The header <code>#SCNDEF &lt;name&gt;</code> uses the scene's name without a <code>.fscn</code> suffix.</li>
+<li>Coordinates are written as integers relative to the saved scene's root object.</li>
+<li>Nested <code>Scene_OBJ</code> instances (child scenes) are written as <code>SCENE &lt;scene-name&gt;.fscn &lt;x&gt; &lt;y&gt; &lt;z&gt;;</code> and their children are intentionally not expanded in the file (a child scene is saved as a reference only).</li>
+<li>Objects are saved using the inline <code>{ ... };</code> child-block syntax for children.</li>
+</ul>
+<h2 id="notes-constraints">Notes &amp; constraints</h2>
+<ul>
+<li>The engine expects object prototypes (class+subclass) to be defined in <code>game/assets/objects.json</code>. <code>Instantiate()</code> will fail if a prototype is missing.</li>
+<li>The parser is forgiving about spacing but requires <code>;</code> terminators (or an inline <code>{</code> block) to disambiguate object termination.</li>
+</ul>
+<h2 id="example-files">Example files</h2>
+<ul>
+<li>See <code>game/demo/scn/test.fscn</code> and <code>game/demo/scn/test_child.fscn</code> for working examples of nested child syntax and <code>SCENE</code> references.</li>
+</ul>
+<p>If you want <code>saveScene</code> to also persist per-object properties (textures, custom properties), I can extend the file format to include a mini-property block for objects; tell me your preferred syntax and I'll implement it.</p>
 
 
 
@@ -513,10 +656,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

@@ -363,6 +363,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#engine-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#example-prototype" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -671,6 +682,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#engine-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#example-prototype" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -792,6 +814,10 @@
 <ul>
 <li><code>game/assets/objects.json</code> may include a <code>properties</code> object per prototype.</li>
 <li><strong>Important</strong>: core engine-managed fields (<code>x</code>,<code>y</code>,<code>z</code>,<code>texref</code>) are ignored when set in prototypes. The engine will emit a warning and strip them.</li>
+</ul>
+<h3 id="engine-validation">Engine validation</h3>
+<ul>
+<li>The engine requires that any <code>OBJECT</code> referenced in scene files corresponds to a prototype present in <code>game/assets/objects.json</code> (i.e. valid <code>obj_class</code> and <code>obj_subclass</code>). If a prototype is missing, <code>Instantiate()</code> will return <code>nullptr</code> and the loader will skip the entry. Ensure your scene files only reference defined subclasses (for example: <code>tile.grass</code>, <code>tile.half_grass</code>, <code>tile.pTest</code>).</li>
 <li>To expose prototype-driven variables, classes must register named property setters:</li>
 <li>In a class constructor, call <code>registerFloatProperty("speed", speed);</code> or <code>registerStringProperty("team", teamName);</code></li>
 <li>For custom parsing, use <code>registerProperty("loot", [this](const Json::Value &amp;v){ /* parse */ });</code></li>

@@ -460,7 +460,18 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Object system">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scene-manager-enginescene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scene manager (engine/scene)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scene manager (engine/scene)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -613,14 +624,7 @@
 <li>
 <p><code>SDL_Window* getWindow()</code></p>
 </li>
-<li>
-<p>Returns the SDL window pointer for platform-specific integrations.</p>
-</li>
-<li>
-<p><code>void loadTileMap(const std::string&amp; jsonFile, int tileWidth, int tileHeight)</code></p>
-</li>
-<li>Loads a tilemap JSON and assigns it to <code>tileMap</code> (owned by Engine).</li>
-<li>Use <code>game/engine_api.h</code> wrapper <code>LoadTileMap()</code> for convenience.</li>
+<li>Returns the SDL window pointer for platform-specific integrations.</li>
 </ul>
 <p>Public fields you may use (beware direct mutations):
 - <code>objManager* objMgr</code> — object manager; use its factory method to instantiate objects.
@@ -631,6 +635,23 @@
 <hr />
 <h2 id="object-system">Object system</h2>
 <p>Files: <code>engine/obj/*</code> and <code>game/assets/objects.json</code>.</p>
+<h2 id="scene-manager-enginescene">Scene manager (engine/scene)</h2>
+<ul>
+<li>
+<p><code>sceneManager::loadScene(path, baseX=0, baseY=0, baseZ=0)</code> — loads the named scene file from the configured scene folder (<code>sceneManager</code> is created by <code>Engine</code> and rooted at <code>game/demo/scn</code> by default). Nested <code>SCENE</code> references are loaded recursively and attached as children; object IDs belonging to the loaded scene are returned in a <code>sceneData</code> structure.</p>
+</li>
+<li>
+<p><code>sceneManager::unloadScene(path)</code> — removes all instantiated objects that were recorded when the scene was loaded (uses the internal <code>loadedScenes</code> map).</p>
+</li>
+<li>
+<p><code>sceneManager::saveScene(name)</code> — writes the scene to the scene folder using the textual format in <code>docs/scene.md</code>. Notes:</p>
+</li>
+<li>Creates the scene folder if missing.</li>
+<li>The header uses the scene name without a <code>.fscn</code> suffix.</li>
+<li>Nested <code>Scene_OBJ</code> children are written as <code>SCENE &lt;scene-file&gt;.fscn x y z;</code> and are not expanded into their children.</li>
+<li>Object coordinates are written relative to the saved scene root and rounded to integers.</li>
+</ul>
+<p>See <code>docs/scene.md</code> for syntax details and examples.</p>
 <ul>
 <li><code>ObjectFactory::registerClass(name, creator)</code></li>
 <li>Register a class creator that returns a <code>unique_ptr&lt;Object&gt;</code>.</li>
@@ -687,8 +708,7 @@ registerFloatProperty(&quot;speed&quot;, speed);
 <hr />
 <h2 id="game-side-helpers-gameengine_apih">Game-side helpers (game/engine_api.h)</h2>
 <p>Includes small inline wrappers:</p>
-<p>-- <code>Object* Instantiate(const string &amp;class, const string &amp;subclass, float x, float y, float z)</code> — script-facing helper that instantiates a prototype; prefer this over calling engine internals.
--- <code>void LoadTileMap(const string &amp;jsonFile, int tileWidth, int tileHeight)</code> — script-facing helper that loads a tilemap into the engine.</p>
+<p>-- <code>Object* Instantiate(const string &amp;class, const string &amp;subclass, float x, float y, float z)</code> — script-facing helper that instantiates a prototype; prefer this over calling engine internals.</p>
 <p>Include <code>game/main.h</code> before <code>game/engine_api.h</code> to access the global <code>engine</code> pointer.</p>
 <hr />
 <h2 id="debugging-build-notes">Debugging &amp; build notes</h2>
