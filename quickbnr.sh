@@ -59,7 +59,9 @@ fi
 
 # Optionally run the built demo
 if [ "$RUN" = true ]; then
-  exec ./game/build/game
+  # Ensure we run with the game directory as the current working directory
+  cd "$SCRIPT_DIR/game"
+  exec ./build/game
 else
-  echo "Build completed. Run ./game/build/game to start the demo."
+  echo "Build completed. Run 'cd ./game && ./build/game' to start the demo."
 fi
