@@ -46,9 +46,7 @@ Public members and usage:
 - `SDL_Window* getWindow()`
   - Returns the SDL window pointer for platform-specific integrations.
 
-- `void loadTileMap(const std::string& jsonFile, int tileWidth, int tileHeight)`
-  - Loads a tilemap JSON and assigns it to `tileMap` (owned by Engine).
-  - Use `game/engine_api.h` wrapper `LoadTileMap()` for convenience.
+
 
 Public fields you may use (beware direct mutations):
 - `objManager* objMgr` — object manager; use its factory method to instantiate objects.
@@ -63,6 +61,20 @@ Note: Prefer using the provided wrappers in `game/engine_api.h` (Instantiate, Lo
 ## Object system
 
 Files: `engine/obj/*` and `game/assets/objects.json`.
+
+## Scene manager (engine/scene)
+
+- `sceneManager::loadScene(path, baseX=0, baseY=0, baseZ=0)` — loads the named scene file from the configured scene folder (`sceneManager` is created by `Engine` and rooted at `game/demo/scn` by default). Nested `SCENE` references are loaded recursively and attached as children; object IDs belonging to the loaded scene are returned in a `sceneData` structure.
+
+- `sceneManager::unloadScene(path)` — removes all instantiated objects that were recorded when the scene was loaded (uses the internal `loadedScenes` map).
+
+- `sceneManager::saveScene(name)` — writes the scene to the scene folder using the textual format in `docs/scene.md`. Notes:
+  - Creates the scene folder if missing.
+  - The header uses the scene name without a `.fscn` suffix.
+  - Nested `Scene_OBJ` children are written as `SCENE <scene-file>.fscn x y z;` and are not expanded into their children.
+  - Object coordinates are written relative to the saved scene root and rounded to integers.
+
+See `docs/scene.md` for syntax details and examples.
 
 - `ObjectFactory::registerClass(name, creator)`
   - Register a class creator that returns a `unique_ptr<Object>`.
@@ -129,7 +141,7 @@ See `engine/render/*`. The `renderPipeline` collects objects and textures into a
 Includes small inline wrappers:
 
 -- `Object* Instantiate(const string &class, const string &subclass, float x, float y, float z)` — script-facing helper that instantiates a prototype; prefer this over calling engine internals.
--- `void LoadTileMap(const string &jsonFile, int tileWidth, int tileHeight)` — script-facing helper that loads a tilemap into the engine.
+
 
 Include `game/main.h` before `game/engine_api.h` to access the global `engine` pointer.
 

@@ -1,53 +1,41 @@
-# FOOSIE
+# FOOSIE — Free Object-Oriented SDL Isometric Engine
 
-[![Docs](https://img.shields.io/badge/docs-FOOSIEngine-blue)](https://realblobii.github.io/FOOSIEngine/)
+[![Docs](https://img.shields.io/badge/docs-FOOSIEngine-blue)](https://realblobii.github.io/FOOSIEngine/)  [![License](https://img.shields.io/badge/license-LGPL%20v3-blue)](LICENSE)
 
-Free Object-Oriented SDL Isometric Engine (FOOSIE) is a Free and Open-Source (FOSS) isometric game engine in C++ using SDL's input/window libraries with the OpenGL renderer, licensed under the GNU LGPL v3.0 or later. 
+FOOSIE is an open-source isometric game engine in C++ using SDL2 and OpenGL. It provides a small, composable object-class system, a lightweight scene format, and an extensible rendering pipeline.
 
-## Installation
+## Quick Start
+Prerequisites (typical on Linux):
+- cmake, ninja or make, GNU toolchain (g++), SDL2, jsoncpp
 
-### Dependencies 
-Dependencies such as GLAD, stb_image, and LearnOpenGL's libraries are included with the repo with their respective licenses in the `/incl` directory, however, you will also need a few extra dependencies.
-```
-sdl
-sdl2-compat
-jsoncpp
-cmake
-make
-gcc
-```
-### Quick Start
-Paste this into your terminal to download, build, and run FOOSIE for the first time:
-```
-git clone https://github.com/realblobii/FOOSIEngine/
+Clone, build and run:
+
+```bash
+git clone https://github.com/realblobii/FOOSIEngine.git
 cd FOOSIEngine
-./quickbnr.sh --gmake
+# Build and run with Ninja (recommended):
+./quickbnr.sh -n         # build & run
+# Build only:
+./quickbnr.sh -n --no-run
+# Clean-build:
+./quickbnr.sh -n -c
 ```
-No errors should show. Open an issue if you get an error and we'll sort it out. 
 
-### Other build options
+If you prefer GNU Make use `-g`.
 
-To use `ninja` instead of GNU Make:
-`./quickbnr.sh --ninja`
+## Project Overview
+- Object system: class+subclass prototypes (data driven via `game/demo/objects.json`) and per-instance placement via `Instantiate()`.
+- Scene format: human-editable `.fscn` files supporting nested child blocks and scene references (`docs/scene.md`).
+- Rendering: simple atlas-based batching suitable for isometric tilemaps and sprites.
 
-To clean the CMake cache before building:
-`./quickbnr.sh --ninja --clean` or `./quickbnr.sh --gmake --clean` (depending on chosen build system). 
+## Where to look next
+- Read the Beginner Guide: `docs/beginner.md`
+- API reference and engine internals: `docs/ENGINE_FUNCTIONS.md`
+- Scene format details: `docs/scene.md`
 
-## Composition
-FOOSIE is composed of three main components: The Isometric Renderer, The Object Class System, and The Registry. These three work together along with the core engine library to create a fully-functional game world. Below is some basic information about these three components, but if you're ready to dig deeper, check out the docs (when they're done!).
+## Contributing
+- Run tests (manual): build & run the demo and inspect `game/demo/scn/*` scenes.
+- Style: follow existing conventions in `docs/conventions.md`.
 
-For full API documentation and developer guidance see the [docs](https://realblobii.github.io/FOOSIEngine).
-
-## The Object Class System
-FOOSIE uses an object class system to manage the properties of various in-game objects. This system acts similar to both Unity's Prefabs and Scriptable Objects.
-
-Objects have a class, and a sub-class. The class is responsible for representing the actual C++ class code of the object. It includes things such as movement code and interacts with the Object Pipeline directly.
-
-The Subclass is a versatile child class for items that share similar functionality. Its main purpose is to create reproducible variants of the main class. Examples include, different tile types in a tilemap, different player skins, different food types.
-
-## The Registry
-FOOSIE uses a system called the object registry. It's literally just a fancy way of saying a hierarchy. 
-
-## The Isometric Renderer
-FOOSIE's renderer uses OpenGL to show a 3D world space using 2d tiles in an isometric perspective. Objects' subclasses will have a list textures bound to them which the code of the object can then select from and send to the renderer. FOOSIE sends all textures and objects to the renderer in one big batch called a texture atlas to greatly speed up rendering and provide a simple fix to layering tiles in world space. 
+For full documentation visit the docs site linked at the top of this README. If you encounter issues, open an issue on GitHub and include reproduction steps and logs. 
 
