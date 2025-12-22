@@ -3,7 +3,7 @@
 This quick-start guide helps you get a small FOOSIEngine project running and shows common tasks for new contributors.
 
 ## Prerequisites
-- Linux (development tested on Ubuntu). Build tools: `cmake`, `make` or Ninja, `g++`.
+- Ideally a linux-based operating system. Build tools: `cmake`, `make` or Ninja, `g++`.
 - SDL2 and jsoncpp installed (your distro package manager provides these).
 
 ## Build & Run
