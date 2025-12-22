@@ -54,7 +54,8 @@ private:
 
     // atlas GL handle and mapping
     unsigned int atlasTex = 0;
-    static const int ATLAS_SIZE = 2048;
+    // atlas size now configurable via Engine::atlas_size
+    int atlasSize = 2048;
     std::unordered_map<std::string, SubTexture> atlasMap; // path -> uv
 
     // loaded raw images (keeps pixel pointers until atlas built)

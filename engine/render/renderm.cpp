@@ -17,6 +17,9 @@ renderPipeline::renderPipeline(Engine* eng)
       defaultShader("shader/default.vs", "shader/default.fs"),
       registry(&eng->objMgr->registry)
 {
+    // initialize atlas size from engine config
+    atlasSize = engine ? engine->atlas_size : 2048;
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -75,8 +78,8 @@ bool renderPipeline::ensureImageLoaded(const std::string& path) {
 void renderPipeline::buildAtlasFromRawImages() {
     if (atlasBuilt) return;
 
-    const int ATLAS_W = ATLAS_SIZE;
-    const int ATLAS_H = ATLAS_SIZE;
+    const int ATLAS_W = atlasSize;
+    const int ATLAS_H = atlasSize;
 
     // Gather list of images to pack (rawImages must be filled)
     std::vector<std::pair<std::string, RawImage>> imgs;
@@ -174,8 +177,8 @@ void renderPipeline::rebuildAtlas() {
 
 // Append object vertices to world verts using the subtexture UVs and depth
 void renderPipeline::appendObjectToVerts(std::vector<float>& verts, const Object* obj, const SubTexture& uv, float zdepth) {
-    const int TILE_W = 64;
-    const int TILE_H = 64;
+    const int TILE_W = engine->tile_width;
+    const int TILE_H = engine->tile_height;
     const int OFFSET_X = engine->virt_sx/2;
     const int OFFSET_Y = engine->virt_sy/2;
 

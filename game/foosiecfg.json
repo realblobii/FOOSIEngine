@@ -1,0 +1,11 @@
+{
+  "window_title": "FOOSIE Demo",
+  "virt_sx": 840,
+  "virt_sy": 480,
+  "fullscreen": true,
+  "tile_width": 64,
+  "tile_height": 64,
+  "atlas_size": 2048,
+  "scene_folder": "demo/scn",
+  "object_files": [ "demo/objects.json" ]
+}

@@ -8,7 +8,8 @@ Engine *engine = nullptr;
 int main(int argc, const char *argv[])
 {
   engine = new Engine{};
-  engine->Init("New Game", 840, 480, true);
+  // No args required: engine reads configuration from game/foosiecfg.json by default
+  engine->Init();
 
   // create simple test scene files and run load/unload
 

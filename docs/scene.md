@@ -1,6 +1,6 @@
 # Scene file format & Scene manager
 
-Location: `engine/scene/*` and `game/demo/scn/*`
+Location: `engine/scene/*` and the configured scene folder (default: `game/demo/scn`)
 
 This page documents the textual scene format and the `sceneManager` API used to load and save scenes.
 

@@ -12,7 +12,8 @@
 
 class objManager {
 public:
-    objManager(const std::string& objFile);
+    // objFiles: list of JSON prototype files to load. Core classes are always required to be present.
+    objManager(const std::vector<std::string>& objFiles);
 
     std::unique_ptr<Object> obj_load(const std::string& obj_class, const std::string& obj_subclass);
     Object* instantiate(const std::string& obj_class,

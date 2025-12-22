@@ -114,36 +114,46 @@ void objManager::removeChild(Object* parent, Object* child)
     child->setParent(nullptr);
 }
 
-objManager::objManager(const std::string& objFile) {
-    std::ifstream file(objFile);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open JSON file: " << objFile << "\n";
-        return;
-    }
+objManager::objManager(const std::vector<std::string>& objFiles) {
+    createRoot();
 
-    Json::Value root;
     Json::CharReaderBuilder builder;
     JSONCPP_STRING errs;
 
-    createRoot();
-
-    if (!Json::parseFromStream(builder, file, &root, &errs)) {
-        std::cerr << "Failed to parse JSON: " << errs << "\n";
-        return;
-    }
-
-    
-    const Json::Value objs = root["objects"];
-    for (const auto& t : objs) {
-        ObjectData data;
-        data.obj_class = t["obj_class"].asString();
-        data.obj_subclass = t["obj_subclass"].asString();
-        data.texture = t["textures"]["default"].asString();
-        // optional properties block that can set object fields (like ScriptableObjects)
-        if (t.isMember("properties")) {
-            data.properties = t["properties"];
+    for (const auto &objFile : objFiles) {
+        std::ifstream file(objFile);
+        std::string tried = objFile;
+        if (!file.is_open()) {
+            // Try relative parent (useful when running from game/ directory)
+            std::string alt = std::string("../") + objFile;
+            std::ifstream f2(alt);
+            if (f2.is_open()) {
+                file.swap(f2);
+                tried = alt;
+            } else {
+                std::cerr << "Warning: Failed to open JSON file: " << objFile << " or " << alt << "\n";
+                continue;
+            }
         }
-        objectDefs.push_back(data);
+
+        Json::Value root;
+        if (!Json::parseFromStream(builder, file, &root, &errs)) {
+            std::cerr << "Failed to parse JSON (" << tried << "): " << errs << "\n";
+            continue;
+        }
+
+        const Json::Value objs = root["objects"];
+        for (const auto& t : objs) {
+            ObjectData data;
+            data.obj_class = t["obj_class"].asString();
+            data.obj_subclass = t["obj_subclass"].asString();
+            data.texture = t["textures"]["default"].asString();
+            // optional properties block that can set object fields (like ScriptableObjects)
+            if (t.isMember("properties")) {
+                data.properties = t["properties"];
+            }
+            objectDefs.push_back(data);
+        }
     }
 }
 

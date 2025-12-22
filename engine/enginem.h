@@ -28,7 +28,25 @@ public:
     Engine();
     ~Engine();
 
-    void Init(const char* title, int w, int h, bool fullscreen);
+    // Initialize engine using optional JSON config file path (defaults to "foosiecfg.json" in the working dir)
+    void Init(const char* cfgPath = "foosiecfg.json");
+
+    // Engine-configurable variables (populated from JSON config)
+    std::string window_title = "FOOSIE";
+    int virt_sx = 840;
+    int virt_sy = 480;
+    bool fullscreen = false;
+
+    // Tile/render configuration
+    int tile_width = 64;
+    int tile_height = 64;
+
+    // Atlas size used by the renderer (square)
+    int atlas_size = 2048;
+
+    // Where textual scene files live (folder relative to game/)
+    std::string scene_folder = "demo/scn";
+
     void handleEvents();
     void update();
     void render();
@@ -52,8 +70,8 @@ public:
 
     
     int sdl_sx, sdl_sy;
-    // logical (virtual) render resolution used for layout and projection
-    int virt_sx, virt_sy;
+    // logical (virtual) render resolution used for layout and projection (set from config)
+    // `virt_sx` and `virt_sy` are declared above as configurable members.
 
 
 
