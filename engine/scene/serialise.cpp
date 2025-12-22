@@ -5,6 +5,8 @@
 #include <sstream>
 #include <memory>
 #include <stdexcept>
+#include <cmath>
+#include <filesystem>
 
 static inline std::string trim(const std::string &s) {
     auto b = s.find_first_not_of(" \t\r\n");
@@ -15,7 +17,7 @@ static inline std::string trim(const std::string &s) {
 
 // extract scene name from header like: SCENE {name} {
 static inline std::string extract_scene_name(const std::string &s) {
-    const std::string keyword = "SCENE";
+    const std::string keyword = "#SCNDEF";
     auto pos = s.find(keyword);
     if (pos == std::string::npos)
         return "";
@@ -73,13 +75,39 @@ sceneData sceneManager::loadScene(
     // ─────────────────────────────
     // Parse scene contents
     // ─────────────────────────────
+    // Stack to track parent objects for nested blocks
+    std::vector<Object*> parentStack;
+    Object* mostRecentObj = nullptr;
+
     while (std::getline(inFile, line)) {
         line = trim(line);
         if (line.empty()) continue;
-        if (line.find('}') != std::string::npos) break;
+        if (line.find("#ENDSCN") != std::string::npos) break;
 
-        if (line.back() == ';')
+        // Handle block open/close (accept closing brace with optional semicolon: "}" or "};")
+        if (line == "{") {
+            if (mostRecentObj) {
+                parentStack.push_back(mostRecentObj);
+            } else {
+                // No object before, so push root scene object
+                parentStack.push_back(scnObj);
+            }
+            continue;
+        }
+        if (line == "}" || line == "};") {
+            if (!parentStack.empty()) parentStack.pop_back();
+            // If the closing brace had a semicolon, that terminates the mostRecentObj
+            if (line == "};") {
+                mostRecentObj = nullptr;
+            }
+            continue;
+        }
+
+        bool endsWithSemicolon = false;
+        if (line.back() == ';') {
             line.pop_back();
+            endsWithSemicolon = true;
+        }
 
         std::istringstream iss(line);
         std::string cmd;
@@ -107,8 +135,15 @@ sceneData sceneManager::loadScene(
 
             if (!obj) continue;
 
-            engine->objMgr->addChild(scnObj, obj);
+            // Add as child to the current parent (top of stack or root scene)
+            Object* parent = parentStack.empty() ? scnObj : parentStack.back();
+            engine->objMgr->addChild(parent, obj);
             sData.scene_obj_ids.push_back(obj->id);
+
+            mostRecentObj = obj;
+            if (endsWithSemicolon) {
+                mostRecentObj = nullptr;
+            }
         }
 
        
@@ -138,8 +173,10 @@ sceneData sceneManager::loadScene(
                 }
             }
 
+            // Add as child to the current parent (top of stack or root scene)
+            Object* parent = parentStack.empty() ? scnObj : parentStack.back();
             if (nestedObj) {
-                engine->objMgr->addChild(scnObj, nestedObj);
+                engine->objMgr->addChild(parent, nestedObj);
             }
 
             sData.scene_obj_ids.insert(
@@ -147,6 +184,11 @@ sceneData sceneManager::loadScene(
                 nested.scene_obj_ids.begin(),
                 nested.scene_obj_ids.end()
             );
+
+            mostRecentObj = nestedObj;
+            if (endsWithSemicolon) {
+                mostRecentObj = nullptr;
+            }
         }
     }
 
@@ -171,5 +213,110 @@ sceneData sceneManager::unloadScene(const std::string& sceneFile){
     }
 
     loadedScenes.erase(it);
+    return sData;
+}
+
+// Helper to check if a Scene_OBJ refers to a nested scene and to get its file name
+static inline std::string scene_filename_from_name(const std::string &name) {
+    if (name.size() >= 6 && name.substr(name.size()-6) == ".fscn") return name;
+    return name + ".fscn";
+}
+
+// Strip trailing .fscn extension if present
+static inline std::string strip_fscn_ext(const std::string &name) {
+    if (name.size() >= 6 && name.substr(name.size()-6) == ".fscn") return name.substr(0, name.size()-6);
+    return name;
+}
+
+// Recursive writer for objects. Scenes (Scene_OBJ) are written as SCENE references and not expanded.
+static void write_object_recursive(std::ostream &out, Object *obj, Object *sceneRoot, int indent=0) {
+    auto indent_str = std::string(indent, ' ');
+
+    // If this object itself is a scene (nested scene), write a SCENE reference and do not expand
+    if (auto *s = dynamic_cast<Scene_OBJ*>(obj)) {
+        int rx = static_cast<int>(std::lround(obj->x - sceneRoot->x));
+        int ry = static_cast<int>(std::lround(obj->y - sceneRoot->y));
+        int rz = static_cast<int>(std::lround(obj->z - sceneRoot->z));
+        out << indent_str << "SCENE " << scene_filename_from_name(s->scnName)
+            << " " << rx << " " << ry << " " << rz << ";\n";
+        return;
+    }
+
+    // Regular object
+    std::string fullcls = obj->obj_class;
+    if (!obj->obj_subclass.empty()) fullcls += "." + obj->obj_subclass;
+
+    int rx = static_cast<int>(std::lround(obj->x - sceneRoot->x));
+    int ry = static_cast<int>(std::lround(obj->y - sceneRoot->y));
+    int rz = static_cast<int>(std::lround(obj->z - sceneRoot->z));
+
+    auto &children = obj->getChildren();
+    if (children.empty()) {
+        out << indent_str << "OBJECT " << fullcls << " " << rx << " " << ry << " " << rz << ";\n";
+    } else {
+        out << indent_str << "OBJECT " << fullcls << " " << rx << " " << ry << " " << rz << "\n";
+        out << indent_str << "{\n";
+        for (auto *c : children) {
+            write_object_recursive(out, c, sceneRoot, indent+4);
+        }
+        out << indent_str << "};\n";
+    }
+}
+
+sceneData sceneManager::saveScene(const std::string& sceneName){
+    sceneData sData;
+
+    // Determine output filename (ensure .fscn extension)
+    std::string outFile = sceneName;
+    if (outFile.size() < 6 || outFile.substr(outFile.size()-6) != ".fscn") {
+        outFile = outFile + ".fscn";
+    }
+
+    // Find the scene object in the registry
+    Scene_OBJ* sceneRoot = nullptr;
+    for (auto &p : engine->objMgr->registry) {
+        auto *s = dynamic_cast<Scene_OBJ*>(p.get());
+        if (!s) continue;
+        if (s->scnName == sceneName || scene_filename_from_name(s->scnName) == outFile || s->scnName + ".fscn" == outFile) {
+            sceneRoot = s;
+            break;
+        }
+    }
+
+    if (!sceneRoot) {
+        throw std::runtime_error("Scene not found: " + sceneName);
+    }
+
+    // Ensure the scene folder exists and open output file inside it
+    try {
+        std::filesystem::path dir(sFolder);
+        if (!std::filesystem::exists(dir)) {
+            std::filesystem::create_directories(dir);
+        }
+    } catch (const std::exception &e) {
+        throw std::runtime_error(std::string("Could not create scene directory: ") + e.what());
+    }
+
+    std::ofstream out(sFolder + "/" + outFile);
+    if (!out.is_open()) {
+        throw std::runtime_error("Could not open scene file for writing: " + outFile);
+    }
+
+    // Header: use scene name without extension for the #SCNDEF line
+    std::string header_name = strip_fscn_ext(sceneRoot->scnName);
+    sData.scene_name = header_name;
+    out << "#SCNDEF " << header_name << "\n";
+    out << "{\n";
+
+    // Iterate immediate children and write them. Nested Scene_OBJ children are written as SCENE refs and not expanded.
+    for (auto *c : sceneRoot->getChildren()) {
+        write_object_recursive(out, c, sceneRoot, 4);
+    }
+
+    out << "};\n";
+    out << "#ENDSCN\n";
+
+    out.close();
+
     return sData;
 }

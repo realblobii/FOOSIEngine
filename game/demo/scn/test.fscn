@@ -1,6 +1,15 @@
-SCENE test 
+#SCNDEF test
 {
     OBJECT tile.grass 10 10 0;
-    OBJECT tile.pTest 10 10 1;
+    OBJECT tile.pTest 10 10 1
+    {
+        OBJECT tile.grass 0 0 1;
+        OBJECT tile.half_grass 1 0 1
+        {
+            OBJECT tile.pTest 2 0 2;
+        };
+    };
     SCENE test2.fscn 11 11 0;
-}
+    SCENE test_child.fscn 20 20 0;
+};
+#ENDSCN

@@ -19,7 +19,7 @@ class sceneManager{
         // base offsets applied when instantiating
         sceneData loadScene(const std::string& sceneFile, int baseX = 0, int baseY = 0, int baseZ = 0);
         sceneData unloadScene(const std::string& sceneFile);
-        sceneData saveScene(const std::vector<std::string>& classes);
+        sceneData saveScene(const std::string& sceneName);
     private:
         const std::string sFolder;
         std::unordered_map<std::string, std::vector<int>> loadedScenes;

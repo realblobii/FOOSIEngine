@@ -1,5 +1,6 @@
-SCENE test2 
+#SCNDEF test2 
 {
     OBJECT tile.pTest 1 1 1;
 
-}
+};
+#ENDSCN
