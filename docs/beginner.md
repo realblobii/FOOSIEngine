@@ -63,5 +63,3 @@ engine->sceneMgr->saveScene("test");
 - `docs/scene.md` — full syntax and save/load semantics
 - `docs/objects.md` — how prototypes and properties work
 - `engine/obj/*` — object implementation & factory pattern
-
-If you'd like, I can add a short example project page showing how to create a minimal scene programmatically and save it to disk.
