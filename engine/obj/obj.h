@@ -19,7 +19,7 @@
         std::string texref = "default";   
         std::string texture; 
         std::string objName;
-        bool invis;
+        bool invis = false;
 
         std::vector<Object*>& getChildren()  { return children; }
 

@@ -4,6 +4,11 @@
       "obj_class": "scene",
       "obj_subclass": "",
       "textures": { "default": "" }
+    },
+    {
+      "obj_class": "camera",
+      "obj_subclass": "",
+      "textures": { "default": "" }
     }
   ]
 }

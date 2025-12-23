@@ -92,6 +92,9 @@ void Engine::Init(const char* cfgPath) {
 
             this->objMgr = new objManager(objFiles);
         }
+        if (!sceneMgr) {
+            this->sceneMgr = new sceneManager(scene_folder);
+        }
         if (!rPipeline){
             stbi_set_flip_vertically_on_load(true);
             this->rPipeline = new renderPipeline(this);}
@@ -101,9 +104,7 @@ void Engine::Init(const char* cfgPath) {
             this->kLnr = new kListener();}
 
         // create scene manager rooted at the game folder so scenes live under configured scene folder
-        if (!sceneMgr) {
-            this->sceneMgr = new sceneManager(scene_folder);
-        }
+        
 
     } else {
         std::cerr << "SDL Initialization Failed: " << SDL_GetError() << std::endl;

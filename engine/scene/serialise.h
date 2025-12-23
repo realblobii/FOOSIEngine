@@ -20,7 +20,11 @@ class sceneManager{
         sceneData loadScene(const std::string& sceneFile, int baseX = 0, int baseY = 0, int baseZ = 0);
         sceneData unloadScene(const std::string& sceneFile);
         sceneData saveScene(const std::string& sceneName);
+
+        Object* camera;
+        bool isCamera = false;
     private:
+        
         const std::string sFolder;
         std::unordered_map<std::string, std::vector<int>> loadedScenes;
 };

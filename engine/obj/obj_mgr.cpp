@@ -1,7 +1,7 @@
 #include "engine/obj/obj_mgr.h"
 #include <fstream>
 #include <iostream>
-#include "game/objclass.h"
+#include "engine/coreclass.h"
 
 int counter = 1;
 
@@ -205,11 +205,17 @@ Object* objManager::instantiate(const std::string& obj_class,
             if (props.isMember("y")) { props.removeMember("y"); warned = true; }
             if (props.isMember("z")) { props.removeMember("z"); warned = true; }
             if (props.isMember("texref")) { props.removeMember("texref"); warned = true; }
+            // disallow prototype from toggling engine-defined visibility
+            if (props.isMember("invis")) { props.removeMember("invis"); warned = true; }
             if (warned) {
-                std::cerr << "objects.json: ignoring deprecated core fields (x,y,z,texref) "
+                std::cerr << "objects.json: ignoring deprecated core fields (x,y,z,texref,invis) "
                           << "for prototype " << obj_class << ":" << obj_subclass << "\n";
             }
             obj->applyProperties(props);
+
+            // Enforce engine semantics for core classes: scene and camera should always be invisible
+            if (obj_class == "scene") obj->invis = true;
+            if (obj_class == "camera") obj->invis = true;
             break;
         }
     }

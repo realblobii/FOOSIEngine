@@ -21,6 +21,8 @@
 #include <fstream>
 #include <unordered_map>
 
+#include "engine/coreclass.h"
+
 class renderPipeline;
 
 class Engine {

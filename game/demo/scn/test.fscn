@@ -1,15 +1,9 @@
 #SCNDEF test
 {
-    OBJECT grass tile.grass 10 10 0;
-    OBJECT bob tile.pTest 10 10 1
-    {
-        OBJECT grass tile.grass 0 0 1;
-        OBJECT smol_gras tile.half_grass 1 0 1
-        {
-            OBJECT baby_bob tile.pTest 2 0 2;
-        };
-    };
-    SCENE test2.fscn 11 11 0;
-    SCENE test_child.fscn 20 20 0;
+    OBJECT grass tile.grass 5 5 0;
+    OBJECT grass tile.grass 4 5 0;
+    OBJECT grass tile.grass 5 4 0;
+    OBJECT grass tile.grass 4 4 0;
+    SCENE bob.fscn 5 5 1;
 };
 #ENDSCN

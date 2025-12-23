@@ -15,6 +15,22 @@ int main(int argc, const char *argv[])
 
   loadScene("test.fscn");
 
+  // Find the player object named "bob" and bind WASD to move it (simple test; not a full controller)
+  Object* bob = nullptr;
+  for (auto &p : engine->objMgr->registry) {
+    if (p && p->objName == "bob") { bob = p.get(); break; }
+  }
+  if (bob && engine->kLnr) {
+    // Move by 1 unit per hold tick; adjust speed as needed
+    engine->kLnr->onKeyHold("a", [bob](const kListener::key &k){ bob->ly += 0.05f; bob->lx -= 0.05f; });
+    engine->kLnr->onKeyHold("d", [bob](const kListener::key &k){ bob->ly -= 0.05f; bob->lx += 0.05f;});
+    engine->kLnr->onKeyHold("w", [bob](const kListener::key &k){ bob->lx -= 0.1f; bob->ly -= 0.1f; });
+    engine->kLnr->onKeyHold("s", [bob](const kListener::key &k){ bob->lx += 0.1f; bob->ly += 0.1f;});
+    std::cout << "WASD bound to 'bob' object (id=" << bob->id << ")\n";
+  } else {
+    std::cout << "Warning: 'bob' not found; WASD not bound" << std::endl;
+  }
+
   while (engine->running())
   {
     engine->handleEvents();

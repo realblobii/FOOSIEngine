@@ -22,6 +22,7 @@ public:
     std::string scnName; 
     Scene_OBJ() {
         obj_class = "scene"; // set the obj_class
+        invis = true;
     }
 };
 

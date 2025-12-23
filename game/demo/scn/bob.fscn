@@ -1,0 +1,9 @@
+#SCNDEF bob 
+{
+    OBJECT bob tile.pTest 0 0 0 
+    {
+        CAMERA 0 0 0;
+    };
+
+};
+#ENDSCN

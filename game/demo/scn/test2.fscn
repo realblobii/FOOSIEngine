@@ -1,6 +1,0 @@
-#SCNDEF test2 
-{
-    OBJECT friend_of_bob tile.pTest 1 1 1;
-
-};
-#ENDSCN

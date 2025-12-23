@@ -192,6 +192,35 @@ sceneData sceneManager::loadScene(
                 mostRecentObj = nullptr;
             }
         }
+        else if (cmd == "CAMERA") {
+            if (isCamera) continue;
+            int x = 0, y = 0, z = 0;
+
+            if (!(iss >> x >> y >> z))
+                continue;
+            
+            Object* obj = Instantiate(
+                "camera",
+                "",
+                "MainCamera",
+                x + baseX,
+                y + baseY,
+                z + baseZ
+            );
+
+            if (!obj) continue;
+            camera = obj;
+            isCamera = true; // mark that the scene has a camera
+            // Add as child to the current parent (top of stack or root scene)
+            Object* parent = parentStack.empty() ? scnObj : parentStack.back();
+            engine->objMgr->addChild(parent, obj);
+            sData.scene_obj_ids.push_back(obj->id);
+
+            mostRecentObj = obj;
+            if (endsWithSemicolon) {
+                mostRecentObj = nullptr;
+            }
+        }
     }
 
     inFile.close();
@@ -210,6 +239,13 @@ sceneData sceneManager::unloadScene(const std::string& sceneFile){
 
     sData.scene_name = sceneFile;
     sData.scene_obj_ids = it->second;
+    if (isCamera){
+    for (auto id : sData.scene_obj_ids){
+        if (id==camera->id){
+            isCamera = false;
+            camera = nullptr;
+        }
+    }}
     if (!sData.scene_obj_ids.empty() && engine && engine->objMgr) {
         engine->objMgr->removeObjectsById(sData.scene_obj_ids);
     }
