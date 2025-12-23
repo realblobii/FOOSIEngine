@@ -19,8 +19,7 @@ public:
 
     virtual void render(renderPipeline* pipeline) = 0;
     // optional prepare step called before rendering (e.g., rebuild atlas)
-    virtual void prepare(renderPipeline* pipeline) {}
-
+        virtual void prepare(renderPipeline* pipeline);
     virtual void rebuildAtlas();
 
 protected:
@@ -38,6 +37,9 @@ protected:
 
     bool ensureImageLoaded(const std::string& path); // loads into rawImages
     void buildAtlasFromRawImages(); // pack & upload atlas; fills atlasMap
+
+    // helper: draw a set of interleaved verts (pos3, normal3, uv2) using texture
+    void drawVerts(renderPipeline* pipeline, const std::vector<float>& verts, unsigned int tex);
 };
 
 #endif // RENDER_LAYER_H

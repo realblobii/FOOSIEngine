@@ -6,6 +6,8 @@ add_library(engine STATIC
     enginem.cpp
     render/texture.cpp
     render/renderm.cpp
+    render/render_layer.cpp
+    render/isometric_layer.cpp
     render/glAbstract.cpp
     obj/obj_mgr.cpp
     input/mouse.cpp
@@ -48,7 +50,7 @@ target_link_libraries(engine
 )
 
 # Optional foogui addon integration: enables building and linking the foogui addon
-option(FOOGUI_INTEGRATION "Enable foogui addon integration (builds and links addons/foogui)" OFF)
+option(FOOGUI_INTEGRATION "Enable foogui addon integration (builds and links addons/foogui)" ON)
 if(FOOGUI_INTEGRATION)
     add_subdirectory(${CMAKE_SOURCE_DIR}/addons/foogui ${CMAKE_BINARY_DIR}/addons_foogui_build)
     target_link_libraries(engine PUBLIC foogui)

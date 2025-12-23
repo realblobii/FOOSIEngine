@@ -107,7 +107,8 @@ void Engine::Init(const char* cfgPath) {
             auto guilptr = guil.get();
             this->rPipeline->addLayer(std::move(guil));
             // example: set default font and a short demo string
-            guilptr->setFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24);
+            // Prefer local fonts managed by the addon; let discovery pick one if unspecified
+            guilptr->setFont("", 24);
             guilptr->addText("Hello, UI Layer!");
 #endif
         }

@@ -31,7 +31,7 @@ void IsometricLayer::render(renderPipeline* pipeline) {
     if (!debugPrinted) {
         debugPrinted = true;
         std::cout << "IsometricLayer: debug: registry size=" << (registry ? registry->size() : 0)
-                  << " atlasEntries=" << atlasMap.size() << " atlasBuilt=" << atlasBuilt << "\n";
+                  << " atlasEntries=" << atlasMap.size() << " atlasBuilt=" << atlasBuilt << " atlasTex=" << atlasTex << "\n";
         int count = 0;
         for (auto &objPtr : *registry) {
             if (!objPtr) continue;
@@ -106,6 +106,7 @@ void IsometricLayer::render(renderPipeline* pipeline) {
 
     // Draw
     pipeline->defaultShader.use();
+    pipeline->defaultShader.setInt("texture1", 0); // ensure sampler uses texture unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, atlasTex);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(worldVerts.size() / 8));

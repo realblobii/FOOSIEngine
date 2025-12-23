@@ -1,4 +1,5 @@
 #include "engine/render/render_layer.h"
+#include "engine/render/renderm.h"
 #include <iostream>
 #include <cstring>
 #include "incl/stb_image.h"
@@ -91,15 +92,17 @@ void RenderLayer::buildAtlasFromRawImages() {
             continue;
         }
 
+        // Add 1px padding between images to avoid sampling bleed
+        const int PAD = 1;
         // If image doesn't fit in current row, move to next row
-        if (curX + ri.w > ATLAS_W) {
+        if (curX + ri.w + PAD > ATLAS_W) {
             curX = 0;
-            curY += rowH;
+            curY += rowH + PAD;
             rowH = 0;
         }
 
         // If it doesn't fit vertically -> fail (you can expand atlas or handle)
-        if (curY + ri.h > ATLAS_H) {
+        if (curY + ri.h + PAD > ATLAS_H) {
             std::cerr << "RenderLayer: atlas overflow, image too large or atlas too small: " << path << "\n";
             continue; // skip this image (transparent will show)
         }
@@ -120,22 +123,22 @@ void RenderLayer::buildAtlasFromRawImages() {
         // store in atlasMap
         atlasMap[path] = SubTexture{u0, v0, u1, v1};
 
-        // advance
-        curX += ri.w;
-        if (ri.h > rowH) rowH = ri.h;
+        // advance (add padding)
+        curX += ri.w + PAD;
+        if (ri.h > rowH) rowH = ri.h + PAD;
     }
 
     // upload to GL
     glGenTextures(1, &atlasTex);
     glBindTexture(GL_TEXTURE_2D, atlasTex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    // Use nearest filtering (no mipmaps) for crisp atlas sampling (important for glyphs)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // upload
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ATLAS_W, ATLAS_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlasPixels);
-    glGenerateMipmap(GL_TEXTURE_2D);
 
     // free temporary atlasPixels (rawImages kept until destructor)
     free(atlasPixels);
@@ -155,6 +158,21 @@ void RenderLayer::rebuildAtlas() {
 }
 
 void RenderLayer::prepare(renderPipeline* pipeline) {
-    // default prepare: ensure atlas is built if not already
+    // default prepare: build atlas from current rawImages (if not already built)
     if (!atlasBuilt) buildAtlasFromRawImages();
 }
+
+void RenderLayer::drawVerts(renderPipeline* pipeline, const std::vector<float>& verts, unsigned int tex) {
+    // Upload to global VBO (shared across layers)
+    pipeline->globalVAO.bind();
+    pipeline->globalVBO->bind();
+    pipeline->globalVBO->update(verts.data(), verts.size());
+
+    // Draw using pipeline shader and specified texture
+    pipeline->defaultShader.use();
+    pipeline->defaultShader.setInt("texture1", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(verts.size() / 8));
+}
+
