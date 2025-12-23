@@ -6,7 +6,7 @@ FOOSIE is an open-source isometric game engine in C++ using SDL2 and OpenGL. It 
 
 ## Quick Start
 Prerequisites (typical on Linux):
-- cmake, ninja or make, GNU toolchain (g++), SDL2, jsoncpp
+- cmake, ninja or make, GNU toolchain (g++), SDL2, jsoncpp, freetype2
 
 Clone, build and run:
 
