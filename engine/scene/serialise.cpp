@@ -59,7 +59,7 @@ sceneData sceneManager::loadScene(
     // ─────────────────────────────
     // Create scene root object
     // ─────────────────────────────
-    Object* baseObj = Instantiate("scene", "", baseX, baseY, baseZ);
+    Object* baseObj = Instantiate("scene", "", "ROOT", baseX, baseY, baseZ);
     if (!baseObj)
         throw std::runtime_error("Failed to instantiate scene object");
 
@@ -117,10 +117,11 @@ sceneData sceneManager::loadScene(
         if (cmd == "OBJECT") {
             std::string clsdot;
             int x = 0, y = 0, z = 0;
+            std::string name;
 
-            if (!(iss >> clsdot >> x >> y >> z))
+            if (!(iss >> name >> clsdot >> x >> y >> z))
                 continue;
-
+            
             auto dot = clsdot.find('.');
             std::string obj_class    = (dot == std::string::npos) ? clsdot : clsdot.substr(0, dot);
             std::string obj_subclass = (dot == std::string::npos) ? ""      : clsdot.substr(dot + 1);
@@ -128,6 +129,7 @@ sceneData sceneManager::loadScene(
             Object* obj = Instantiate(
                 obj_class,
                 obj_subclass,
+                name,
                 x + baseX,
                 y + baseY,
                 z + baseZ

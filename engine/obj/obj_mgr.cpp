@@ -176,6 +176,7 @@ void objManager::printRegistry() const {
 
 Object* objManager::instantiate(const std::string& obj_class,
                                 const std::string& obj_subclass,
+                                const std::string& name,
                                 float x, float y, float z)
 {
     auto obj = obj_load(obj_class, obj_subclass);
@@ -190,6 +191,7 @@ Object* objManager::instantiate(const std::string& obj_class,
     obj->z = z;
     obj->id = counter++;
     obj->texref = "default";
+    obj->objName = name;
 
     // Apply subclass properties from objects.json (overrides defaults)
     // Enforcement: we DO NOT allow prototype JSON to set core instance

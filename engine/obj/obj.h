@@ -18,6 +18,7 @@
         std::string obj_subclass;
         std::string texref = "default";   
         std::string texture; 
+        std::string objName;
         bool invis;
 
         std::vector<Object*>& getChildren()  { return children; }
@@ -39,6 +40,7 @@
             if (id != 0){
             std::cout << "OBJECT ID " << id
                     << " CLASS " << obj_class << "." << obj_subclass
+                    << " NAME " << objName
                     << " TEXREF " << texref
                     << " TEXTURE " << texture
                     << " GLOBAL COORDS (" << x << ", " << y << ", " << z << ")"

@@ -14,12 +14,13 @@ extern Engine* engine;
 static inline Object* Instantiate(
     const std::string& obj_class,
     const std::string& obj_subclass,
+    const std::string& name,
     float x = 0.0f,
     float y = 0.0f,
     float z = 0.0f
 ) {
     if (!engine || !engine->objMgr) return nullptr;
-    return engine->objMgr->instantiate(obj_class, obj_subclass, x, y, z);
+    return engine->objMgr->instantiate(obj_class, obj_subclass, name, x, y, z);
 }
 
 static inline sceneData loadScene(

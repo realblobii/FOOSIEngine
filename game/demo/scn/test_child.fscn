@@ -1,12 +1,12 @@
 #SCNDEF test_child
 {
-    OBJECT tile.pTest 5 5 0
+    OBJECT greg tile.pTest 5 5 0
     {
-        OBJECT tile.grass 1 1 1;
-        OBJECT tile.half_grass 2 2 1;
+        OBJECT gregrass tile.grass 1 1 1;
+        OBJECT s tile.half_grass 2 2 1;
     };
 
 
-    OBJECT tile.grass 6 6 0;
+    OBJECT mmm_grr tile.grass -6 6 0;
 };
 #ENDSCN

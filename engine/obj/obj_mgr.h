@@ -18,6 +18,7 @@ public:
     std::unique_ptr<Object> obj_load(const std::string& obj_class, const std::string& obj_subclass);
     Object* instantiate(const std::string& obj_class,
                                 const std::string& obj_subclass,
+                                const std::string& name,
                                 float x, float y, float z);
     
     Object* createRoot();

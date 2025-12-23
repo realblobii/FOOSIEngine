@@ -14,7 +14,7 @@ public:
     
     void describe() const {
         std::cout << "OBJECT ID " << id
-                  << " CLASS " << obj_class << "." << scnName
+                  << " NAME " << scnName
                   << " GLOBAL COORDS (" << x << ", " << y << ", " << z << ")"
                   << " LOCAL COORDS (" << lx << ", " << ly << ", " << lz << ")\n";
     }

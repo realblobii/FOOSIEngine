@@ -1,6 +1,6 @@
 #SCNDEF test2 
 {
-    OBJECT tile.pTest 1 1 1;
+    OBJECT friend_of_bob tile.pTest 1 1 1;
 
 };
 #ENDSCN
