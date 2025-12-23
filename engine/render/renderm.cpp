@@ -1,4 +1,6 @@
 #include "engine/render/renderm.h"
+#include "engine/render/render_layer.h"
+#include "engine/render/isometric_layer.h"
 #include <algorithm>
 #include <cstring> // memcpy
 
@@ -17,8 +19,8 @@ renderPipeline::renderPipeline(Engine* eng)
       defaultShader("shader/default.vs", "shader/default.fs"),
       registry(&eng->objMgr->registry)
 {
-    // initialize atlas size from engine config
-    atlasSize = engine ? engine->atlas_size : 2048;
+    // atlas size used by layers
+    int layerAtlasSize = engine ? engine->atlas_size : 2048;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -32,23 +34,16 @@ renderPipeline::renderPipeline(Engine* eng)
 
     // create empty VBO (we will allocate with update)
     globalVBO = new vbo(nullptr, 0);
-}
+
+    // default: add the existing isometric renderer as one layer
+    layers.emplace_back(std::make_unique<IsometricLayer>(engine, registry, layerAtlasSize));
+} 
 
 renderPipeline::~renderPipeline() {
-    // free raw images
-    for (auto &p : rawImages) {
-        if (p.second.pixels) stbi_image_free(p.second.pixels);
-    }
-    rawImages.clear();
-
+    // Layers own their own raw images and textures and will clean up in their destructors
     if (globalVBO) {
         delete globalVBO;
         globalVBO = nullptr;
-    }
-
-    if (atlasTex) {
-        glDeleteTextures(1, &atlasTex);
-        atlasTex = 0;
     }
 }
 
@@ -61,8 +56,21 @@ float renderPipeline::screenToNDCy(int screenY) {
     return 1.0f - (2.0f * float(screenY) / float(engine->virt_sy));
 }
 
-// Ensure image is loaded into rawImages (RGBA)
-bool renderPipeline::ensureImageLoaded(const std::string& path) {
+// RenderLayer: manages its own raw images and atlas
+renderPipeline::RenderLayer::~RenderLayer() {
+    // free raw images
+    for (auto &p : rawImages) {
+        if (p.second.pixels) stbi_image_free(p.second.pixels);
+    }
+    rawImages.clear();
+
+    if (atlasTex) {
+        glDeleteTextures(1, &atlasTex);
+        atlasTex = 0;
+    }
+}
+
+bool renderPipeline::RenderLayer::ensureImageLoaded(const std::string& path) {
     // If already loaded, ok
     if (rawImages.count(path)) return true;
 
@@ -80,7 +88,7 @@ bool renderPipeline::ensureImageLoaded(const std::string& path) {
     int w,h,channels;
     unsigned char* data = stbi_load(path.c_str(), &w, &h, &channels, 4);
     if (!data) {
-        std::cerr << "renderPipeline: failed to load image: " << path << " -- using placeholder" << std::endl;
+        std::cerr << "RenderLayer: failed to load image: " << path << " -- using placeholder" << std::endl;
         // Insert placeholder under the requested key so lookups by path succeed
         RawImage ri;
         ri.w = 1;
@@ -98,8 +106,7 @@ bool renderPipeline::ensureImageLoaded(const std::string& path) {
     return true;
 }
 
-// Build a simple shelf-packed atlas and upload to GPU
-void renderPipeline::buildAtlasFromRawImages() {
+void renderPipeline::RenderLayer::buildAtlasFromRawImages() {
     if (atlasBuilt) return;
 
     const int ATLAS_W = atlasSize;
@@ -119,7 +126,7 @@ void renderPipeline::buildAtlasFromRawImages() {
     size_t atlasBytes = size_t(ATLAS_W) * size_t(ATLAS_H) * 4;
     unsigned char* atlasPixels = (unsigned char*)malloc(atlasBytes);
     if (!atlasPixels) {
-        std::cerr << "renderPipeline: failed to allocate atlas buffer\n";
+        std::cerr << "RenderLayer: failed to allocate atlas buffer\n";
         return;
     }
     // initialize transparent
@@ -130,7 +137,7 @@ void renderPipeline::buildAtlasFromRawImages() {
         const RawImage &ri = p.second;
 
         if (ri.w <= 0 || ri.h <= 0) {
-            std::cerr << "renderPipeline: invalid image size: " << path << "\n";
+            std::cerr << "RenderLayer: invalid image size: " << path << "\n";
             continue;
         }
 
@@ -143,7 +150,7 @@ void renderPipeline::buildAtlasFromRawImages() {
 
         // If it doesn't fit vertically -> fail (you can expand atlas or handle)
         if (curY + ri.h > ATLAS_H) {
-            std::cerr << "renderPipeline: atlas overflow, image too large or atlas too small: " << path << "\n";
+            std::cerr << "RenderLayer: atlas overflow, image too large or atlas too small: " << path << "\n";
             continue; // skip this image (transparent will show)
         }
 
@@ -184,12 +191,10 @@ void renderPipeline::buildAtlasFromRawImages() {
     free(atlasPixels);
 
     atlasBuilt = true;
-    std::cout << "renderPipeline: atlas built with " << atlasMap.size() << " entries\n";
+    std::cout << "RenderLayer: atlas built with " << atlasMap.size() << " entries\n";
 }
 
-// If you load textures dynamically, call this to rebuild atlas
-void renderPipeline::rebuildAtlas() {
-    // remake atlas from current rawImages
+void renderPipeline::RenderLayer::rebuildAtlas() {
     if (atlasTex) {
         glDeleteTextures(1, &atlasTex);
         atlasTex = 0;
@@ -245,33 +250,61 @@ void renderPipeline::appendObjectToVerts(std::vector<float>& verts, const Object
     }
 }
 
-// Main renderAll: builds atlas (if needed), builds one big VBO, draws with single texture
+// Main renderAll: dispatches to registered layers and performs final buffer swap once
 void renderPipeline::renderAll() {
     if (!registry || registry->empty()) return;
+
+    // Clear GL buffers once per frame
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Prepare and render each layer in order
+    for (auto &layer : layers) {
+        if (!layer) continue;
+        layer->prepare(this);
+        layer->render(this);
+    }
+
+    // Swap buffers once after all layers rendered
+    SDL_GL_SwapWindow(engine->getWindow());
+}
+
+// request full atlas rebuild on all layers
+void renderPipeline::rebuildAtlas() {
+    for (auto &layer : layers) {
+        if (layer) layer->rebuildAtlas();
+    }
+}
+
+// Isometric layer implementation (moves the old pipeline rendering logic into a layer)
+renderPipeline::IsometricLayer::IsometricLayer(Engine* eng, std::vector<std::unique_ptr<Object>>* reg, int atlasSize)
+    : RenderLayer(eng, atlasSize), registry(reg) {}
+
+void renderPipeline::IsometricLayer::render(renderPipeline* pipeline) {
+    if (!registry || registry->empty()) return;
+
     // Compute camera rectangle (full screen for now, modify if using camera offset)
-    struct CameraRect {
-        int x0, y0, x1, y1;
-    };
+    struct CameraRect { int x0, y0, x1, y1; };
     CameraRect camRect{ 0, 0, engine->virt_sx, engine->virt_sy };
 
-// Ensure all textures used by objects are loaded (create placeholder if missing)
+    // Ensure all textures used by objects are loaded (create placeholder if missing)
     for (auto &objPtr : *registry) {
         if (!objPtr) continue;
         if (objPtr->id == 0) continue;
         const std::string &path = objPtr->texture; // may be empty
         if (!ensureImageLoaded(path)) {
-            std::cerr << "renderPipeline: warning: failed to load texture: " << path << " (using placeholder)" << std::endl;
+            std::cerr << "IsometricLayer: warning: failed to load texture: " << path << " (using placeholder)" << std::endl;
         }
     }
 
-    //  Build atlas once
+    // Build atlas once
     if (!atlasBuilt) buildAtlasFromRawImages();
 
     // Debug: print a single-frame summary if something looks wrong (helps track missing textures)
     static bool debugPrinted = false;
     if (!debugPrinted) {
         debugPrinted = true;
-        std::cout << "renderPipeline: debug: registry size=" << (registry ? registry->size() : 0)
+        std::cout << "IsometricLayer: debug: registry size=" << (registry ? registry->size() : 0)
                   << " atlasEntries=" << atlasMap.size() << " atlasBuilt=" << atlasBuilt << "\n";
         int count = 0;
         for (auto &objPtr : *registry) {
@@ -281,17 +314,13 @@ void renderPipeline::renderAll() {
                       << " tex='" << objPtr->texture << "' invis=" << objPtr->invis << "\n";
             if (++count >= 10) break;
         }
-        std::cout << "renderPipeline: atlas entries list:\n";
+        std::cout << "IsometricLayer: atlas entries list:\n";
         for (auto &p : atlasMap) {
             std::cout << "  '" << p.first << "' -> u0=" << p.second.u0 << " v0=" << p.second.v0 << " u1=" << p.second.u1 << " v1=" << p.second.v1 << "\n";
         }
     }
 
-    //  Clear GL buffers
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //  Sort objects in isometric order (include objects without texture; they will use a placeholder)
+    // Sort objects in isometric order (include objects without texture; they will use a placeholder)
     std::vector<Object*> sorted;
     for (auto& obj : *registry) if (obj && obj->id != 0 && !obj->invis) sorted.push_back(obj.get());
     std::sort(sorted.begin(), sorted.end(), [](Object* a, Object* b){
@@ -300,16 +329,16 @@ void renderPipeline::renderAll() {
         return a->x < b->x;
     });
 
-    //  Build worldVerts with culling
+    // Build worldVerts with culling
     std::vector<float> worldVerts;
     worldVerts.reserve(sorted.size() * 6 * 8);
 
-    auto isObjectOnScreen = [&](const Object* obj) {
-        const int TILE_W = engine->tile_width;
-        const int TILE_H = engine->tile_height;
-        const int OFFSET_X = engine->virt_sx / 2;
-        const int OFFSET_Y = engine->virt_sy / 2;
+    const int TILE_W = engine->tile_width;
+    const int TILE_H = engine->tile_height;
+    const int OFFSET_X = engine->virt_sx/2;
+    const int OFFSET_Y = engine->virt_sy/2;
 
+    auto isObjectOnScreen = [&](const Object* obj) {
         // account for camera offset if present
         float camX = 0.0f, camY = 0.0f, camZ = 0.0f;
         if (engine && engine->sceneMgr && engine->sceneMgr->isCamera && engine->sceneMgr->camera) {
@@ -341,20 +370,17 @@ void renderPipeline::renderAll() {
 
         SubTexture uv = atlasMap.count(obj->texture) ? atlasMap[obj->texture] : SubTexture{0,0,1,1};
         float depth = -0.000001f * float(index++);
-        appendObjectToVerts(worldVerts, obj, uv, depth);
+        pipeline->appendObjectToVerts(worldVerts, obj, uv, depth);
     }
 
-    //  Upload to global VBO
-    globalVAO.bind();
-    globalVBO->bind();
-    globalVBO->update(worldVerts.data(), worldVerts.size());
+    // Upload to global VBO (shared for layers)
+    pipeline->globalVAO.bind();
+    pipeline->globalVBO->bind();
+    pipeline->globalVBO->update(worldVerts.data(), worldVerts.size());
 
     // Draw
-    defaultShader.use();
+    pipeline->defaultShader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, atlasTex);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(worldVerts.size() / 8));
-
-    // Swap buffers
-    SDL_GL_SwapWindow(engine->getWindow());
 }

@@ -46,3 +46,12 @@ target_link_libraries(engine
         ${SDL2_LIBRARIES}
         ${JSONCPP_LIBRARIES}   # correct plural variable
 )
+
+# Optional foogui addon integration: enables building and linking the foogui addon
+option(FOOGUI_INTEGRATION "Enable foogui addon integration (builds and links addons/foogui)" OFF)
+if(FOOGUI_INTEGRATION)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/addons/foogui ${CMAKE_BINARY_DIR}/addons_foogui_build)
+    target_link_libraries(engine PUBLIC foogui)
+    target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/addons/foogui)
+    target_compile_definitions(engine PUBLIC USE_FOOGUI)
+endif()
