@@ -34,16 +34,30 @@ Object* objManager::createRoot() {
 // Object texture management
 //----------------------------------
 void Object::resolveTexture(const objManager& mgr) {
-    // find this object's texture from JSON based on texref
+    // If manual mode is enabled, do not attempt to resolve from prototypes
+    if (manualTex) return;
+
+    // find this object's texture mapping from JSON based on texref name
     for (const auto& data : mgr.objectDefs) {
         if (data.obj_class == obj_class && data.obj_subclass == obj_subclass) {
-            // JSON uses data.texture as the "default" texref,
-            // but you could extend this to handle more refs if needed.
-            if (texref == "default") {
-                texture = data.texture;
+            const Json::Value &textures = data.textures;
+            if (textures.isObject()) {
+                // prefer explicit texref name
+                if (!texref.empty() && textures.isMember(texref)) {
+                    texture = textures[texref].asString();
+                    return;
+                }
+                // fall back to default
+                if (textures.isMember("default")) {
+                    texture = textures["default"].asString();
+                    return;
+                }
+            } else if (textures.isString()) {
+                // backward compatible: single default string
+                texture = textures.asString();
+                return;
             }
-            
-            return;
+            break;
         }
     }
 
@@ -53,8 +67,14 @@ void Object::resolveTexture(const objManager& mgr) {
 }
 
 void Object::setTex(const std::string& newRef, const objManager& mgr) {
-    texref = newRef;
-    resolveTexture(mgr);
+    if (manualTex) {
+        // caller provided actual texture path when in manual mode
+        texture = newRef;
+        texref = newRef;
+    } else {
+        texref = newRef;
+        resolveTexture(mgr);
+    }
 }
 
 void objManager::printTree(Object* obj, const std::string& prefix, bool isLast) {
@@ -147,7 +167,8 @@ objManager::objManager(const std::vector<std::string>& objFiles) {
             ObjectData data;
             data.obj_class = t["obj_class"].asString();
             data.obj_subclass = t["obj_subclass"].asString();
-            data.texture = t["textures"]["default"].asString();
+            // store full textures mapping so we can resolve by texref names
+            data.textures = t["textures"];
             // optional properties block that can set object fields (like ScriptableObjects)
             if (t.isMember("properties")) {
                 data.properties = t["properties"];

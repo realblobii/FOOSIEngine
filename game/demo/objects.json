@@ -20,20 +20,6 @@
             "textures": {
                 "default": "demo/player.png"
             }
-        },
-        {
-            "obj_class": "scene",
-            "obj_subclass": "",
-            "textures": {
-                "default": ""
-            }
-        },
-        {
-            "obj_class": "tmap",
-            "obj_subclass": "",
-            "textures": {
-                "default": ""
-            }
         }
         
     ]

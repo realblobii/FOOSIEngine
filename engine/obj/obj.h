@@ -20,6 +20,14 @@
         std::string texture; 
         std::string objName;
         bool invis = false;
+        bool manualTex = false;
+
+        Object() {
+            // allow prototypes to opt-out of automatic texture resolution
+            registerBoolProperty("manualTex", manualTex);
+            // allow prototypes to directly set the resolved texture path when manual mode is enabled
+            registerStringProperty("texture", texture);
+        }
 
         std::vector<Object*>& getChildren()  { return children; }
 

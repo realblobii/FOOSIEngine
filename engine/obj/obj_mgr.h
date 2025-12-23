@@ -46,7 +46,7 @@ private:
     struct ObjectData {
         std::string obj_class;
         std::string obj_subclass;
-        std::string texture;
+        Json::Value textures;   // mapping of named texture refs -> texture path
         Json::Value properties;
     };
     Object* root = nullptr;
