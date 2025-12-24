@@ -1,8 +1,7 @@
 #include "engine/enginem.h"
 #include "engine/render/renderm.h"
-#ifdef USE_FOOGUI
-#include "addons/foogui/foogui.h"
-#endif  
+#include "engine/foogui/foogui.h"
+
  
 
 
@@ -101,8 +100,7 @@ void Engine::Init(const char* cfgPath) {
         if (!rPipeline){
             stbi_set_flip_vertically_on_load(true);
             this->rPipeline = new renderPipeline(this);
-#ifdef USE_FOOGUI
-            // integrate foogui addon layer if compiled in
+            // integrate foogui addon layer
             auto guil = std::make_unique<foogui::GuiLayer>(this, atlas_size);
             auto guilptr = guil.get();
             this->rPipeline->addLayer(std::move(guil));
@@ -110,7 +108,6 @@ void Engine::Init(const char* cfgPath) {
             // Prefer local fonts managed by the addon; let discovery pick one if unspecified
             guilptr->setFont("", 24);
             guilptr->addText("Hello, UI Layer!");
-#endif
         }
         if (!mLnr){
             this->mLnr = new mListener();}

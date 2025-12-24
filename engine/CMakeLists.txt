@@ -13,6 +13,8 @@ add_library(engine STATIC
     input/mouse.cpp
     input/keyboard.cpp
     scene/serialise.cpp
+    foogui/foogui.cpp
+    foogui/ft2gl.cpp
 )
 
 # Glad is its own static library
@@ -25,6 +27,7 @@ target_include_directories(stb_image PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl)
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Freetype REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 
@@ -33,6 +36,7 @@ target_include_directories(engine
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${SDL2_INCLUDE_DIRS}
         ${JSONCPP_INCLUDE_DIRS}
+        ${FREETYPE_INCLUDE_DIRS}
 )
 target_include_directories(glad
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../incl
@@ -47,13 +51,6 @@ target_link_libraries(engine
         OpenGL::GL
         ${SDL2_LIBRARIES}
         ${JSONCPP_LIBRARIES}   # correct plural variable
+        ${FREETYPE_LIBRARY}
 )
 
-# Optional foogui addon integration: enables building and linking the foogui addon
-option(FOOGUI_INTEGRATION "Enable foogui addon integration (builds and links addons/foogui)" ON)
-if(FOOGUI_INTEGRATION)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/addons/foogui ${CMAKE_BINARY_DIR}/addons_foogui_build)
-    target_link_libraries(engine PUBLIC foogui)
-    target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/addons/foogui)
-    target_compile_definitions(engine PUBLIC USE_FOOGUI)
-endif()

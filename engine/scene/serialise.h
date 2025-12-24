@@ -16,8 +16,8 @@ struct sceneData{
 class sceneManager{
     public:
         sceneManager(const std::string& fldr) : sFolder(fldr) {}
-        // base offsets applied when instantiating
-        sceneData loadScene(const std::string& sceneFile, int baseX = 0, int baseY = 0, int baseZ = 0);
+        // base offsets applied when instantiating (supports float offsets)
+        sceneData loadScene(const std::string& sceneFile, float baseX = 0.0f, float baseY = 0.0f, float baseZ = 0.0f);
         sceneData unloadScene(const std::string& sceneFile);
         sceneData saveScene(const std::string& sceneName);
 

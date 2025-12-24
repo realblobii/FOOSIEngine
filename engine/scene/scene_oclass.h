@@ -13,7 +13,7 @@ class Scene_OBJ : public Object {
 public:
     
     void describe() const {
-        std::cout << "OBJECT ID " << id
+        std::cout << "SCENE ID " << id
                   << " NAME " << scnName
                   << " GLOBAL COORDS (" << x << ", " << y << ", " << z << ")"
                   << " LOCAL COORDS (" << lx << ", " << ly << ", " << lz << ")\n";

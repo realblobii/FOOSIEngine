@@ -4,6 +4,6 @@
     OBJECT grass tile.grass 4 5 0;
     OBJECT grass tile.grass 5 4 0;
     OBJECT grass tile.grass 4 4 0;
-    SCENE bob.fscn 5 5 1;
+    SCENE bob.fscn 4.5 4.5 1;
 };
 #ENDSCN

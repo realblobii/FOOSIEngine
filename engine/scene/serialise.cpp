@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <filesystem>
+#include <iomanip> // for writing floats with precision
 
 static inline std::string trim(const std::string &s) {
     auto b = s.find_first_not_of(" \t\r\n");
@@ -29,9 +30,9 @@ static inline std::string extract_scene_name(const std::string &s) {
 
 sceneData sceneManager::loadScene(
     const std::string& sceneFile,
-    int baseX,
-    int baseY,
-    int baseZ
+    float baseX,
+    float baseY,
+    float baseZ
 ){
     sceneData sData;
 
@@ -116,7 +117,7 @@ sceneData sceneManager::loadScene(
         // ───────── OBJECT ─────────
         if (cmd == "OBJECT") {
             std::string clsdot;
-            int x = 0, y = 0, z = 0;
+            float x = 0.0f, y = 0.0f, z = 0.0f; // support decimals
             std::string name;
 
             if (!(iss >> name >> clsdot >> x >> y >> z))
@@ -153,7 +154,7 @@ sceneData sceneManager::loadScene(
         // ───────── NESTED SCENE ─────────
         else if (cmd == "SCENE") {
             std::string path;
-            int x = 0, y = 0, z = 0;
+            float x = 0.0f, y = 0.0f, z = 0.0f;
 
             if (!(iss >> path >> x >> y >> z))
                 continue;
@@ -194,7 +195,7 @@ sceneData sceneManager::loadScene(
         }
         else if (cmd == "CAMERA") {
             if (isCamera) continue;
-            int x = 0, y = 0, z = 0;
+            float x = 0.0f, y = 0.0f, z = 0.0f;
 
             if (!(iss >> x >> y >> z))
                 continue;
@@ -272,11 +273,13 @@ static void write_object_recursive(std::ostream &out, Object *obj, Object *scene
 
     // If this object itself is a scene (nested scene), write a SCENE reference and do not expand
     if (auto *s = dynamic_cast<Scene_OBJ*>(obj)) {
-        int rx = static_cast<int>(std::lround(obj->x - sceneRoot->x));
-        int ry = static_cast<int>(std::lround(obj->y - sceneRoot->y));
-        int rz = static_cast<int>(std::lround(obj->z - sceneRoot->z));
+        float rx = obj->x - sceneRoot->x;
+        float ry = obj->y - sceneRoot->y;
+        float rz = obj->z - sceneRoot->z;
         out << indent_str << "SCENE " << scene_filename_from_name(s->scnName)
-            << " " << rx << " " << ry << " " << rz << ";\n";
+            << " " << std::fixed << std::setprecision(3) << rx << " " << ry << " " << rz << ";\n";
+        // reset formatting to default (avoid affecting callers)
+        out << std::defaultfloat;
         return;
     }
 
@@ -284,15 +287,17 @@ static void write_object_recursive(std::ostream &out, Object *obj, Object *scene
     std::string fullcls = obj->obj_class;
     if (!obj->obj_subclass.empty()) fullcls += "." + obj->obj_subclass;
 
-    int rx = static_cast<int>(std::lround(obj->x - sceneRoot->x));
-    int ry = static_cast<int>(std::lround(obj->y - sceneRoot->y));
-    int rz = static_cast<int>(std::lround(obj->z - sceneRoot->z));
+    float rx = obj->x - sceneRoot->x;
+    float ry = obj->y - sceneRoot->y;
+    float rz = obj->z - sceneRoot->z;
 
     auto &children = obj->getChildren();
     if (children.empty()) {
-        out << indent_str << "OBJECT " << fullcls << " " << rx << " " << ry << " " << rz << ";\n";
+        out << indent_str << "OBJECT " << fullcls << " " << std::fixed << std::setprecision(3) << rx << " " << ry << " " << rz << ";\n";
+        out << std::defaultfloat;
     } else {
-        out << indent_str << "OBJECT " << fullcls << " " << rx << " " << ry << " " << rz << "\n";
+        out << indent_str << "OBJECT " << fullcls << " " << std::fixed << std::setprecision(3) << rx << " " << ry << " " << rz << "\n";
+        out << std::defaultfloat;
         out << indent_str << "{\n";
         for (auto *c : children) {
             write_object_recursive(out, c, sceneRoot, indent+4);

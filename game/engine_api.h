@@ -25,9 +25,9 @@ static inline Object* Instantiate(
 
 static inline sceneData loadScene(
     const std::string& sceneFile,
-    int baseX = 0,
-    int baseY = 0,
-    int baseZ = 0
+    float baseX = 0.0f,
+    float baseY = 0.0f,
+    float baseZ = 0.0f
 ) {
     if (!engine || !engine->sceneMgr) return sceneData{};
     return engine->sceneMgr->loadScene(sceneFile, baseX, baseY, baseZ);
