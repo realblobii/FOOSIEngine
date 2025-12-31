@@ -115,7 +115,14 @@ void Engine::Init(const char* cfgPath) {
             this->kLnr = new kListener();}
 
         // create scene manager rooted at the game folder so scenes live under configured scene folder
-        
+
+        // Setup performance counters for delta-time and FPS
+        perfFreq = static_cast<double>(SDL_GetPerformanceFrequency());
+        lastCounter = SDL_GetPerformanceCounter();
+        fpsTimerStart = lastCounter;
+        fpsCount = 0;
+        deltaTime = 0.0f;
+        fps = 0.0f;
 
     } else {
         std::cerr << "SDL Initialization Failed: " << SDL_GetError() << std::endl;
@@ -138,8 +145,24 @@ while (SDL_PollEvent(&event)) {
 }
 }
 void Engine::update() {
+    // Delta-time calculation
+    uint64_t now = SDL_GetPerformanceCounter();
+    deltaTime = static_cast<float>((now - lastCounter) / perfFreq);
+    // clamp to avoid huge jumps after pauses
+    if (deltaTime > 0.25f) deltaTime = 0.25f;
+    lastCounter = now;
+
+    // FPS accounting
+    fpsCount++;
+    if ((now - fpsTimerStart) >= static_cast<uint64_t>(perfFreq)) {
+        double secs = (now - fpsTimerStart) / perfFreq;
+        fps = fpsCount / static_cast<float>(secs);
+        fpsCount = 0;
+        fpsTimerStart = now;
+    }
+
     for (auto& obj : objMgr->registry){
-        obj->Update();
+        obj->UpdateDelta(deltaTime);
 
         if (!obj->getParent()) continue; // root or detached object
         
@@ -186,4 +209,16 @@ void Engine::clean() {
     SDL_GL_DeleteContext(glContext);
     SDL_Quit();
     std::cout << "Engine Closed Successfully\n";
+}
+
+float Engine::getDeltaT() {
+    return deltaTime;
+}
+
+float Engine::getFPS() const {
+    return fps;
+}
+
+void Engine::printFPS() {
+    std::cout << "FPS: " << fps << " dt: " << deltaTime << std::endl;
 }

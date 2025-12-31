@@ -2,6 +2,9 @@
 
 Location: `engine/obj/*`, `game/assets/objects.json`
 
+Purpose
+- Describe object classes, prototype-driven properties (`objects.json`), object creation, and the runtime registry.
+
 ## Key concepts
 ### - Classes vs Subclasses:
   - A *class* maps to a C++ type (registered via `ObjectFactory::registerClass()`).
@@ -34,6 +37,22 @@ Location: `engine/obj/*`, `game/assets/objects.json`
 
 ## Extending classes
 - Override `applyProperties` only if you need custom behavior; the preferred pattern is to register setters in the constructor.
+
+## UI objects (ui.text)
+
+- The engine includes a built-in `ui.text` subclass for screen-space labels that are rendered by the GuiLayer (not as world-space textures).
+- Class: `UIText_OBJ` (registered as `ui.text`). Properties available in prototypes and scene files:
+  - `text` (string) — the literal text to display.
+  - `font` (string) — path to a TTF file (e.g., `demo/fonts/DMSans.ttf`) or empty to use the default discovered font.
+  - `size` (int) — pixel font size.
+  - `nx`, `ny` (float) — normalized (0..1) coordinates mapping to NDC for screen placement (preferred for `UI` syntax). If you supply `sx`/`sy` instead, those are treated as pixel positions.
+  - `sx`, `sy` (float) — pixel coordinates (screen space); used if `nx/ny` are negative.
+  - `r`, `g`, `b`, `a` (float) — color components in [0..1].
+
+- Important: `ui.*` objects do not attempt engine texture resolution (they are not looked up in `objects.json` texture maps). The GuiLayer manages font rendering and glyph atlases directly.
+
+- Creation: use scene `UI` syntax (see `docs/scene.md`) or the convenience helper `InstantiateUIText()` in `game/engine_api.h`.
+
 
 ## Object Manipulation
 ### Creation

@@ -6,6 +6,7 @@ Welcome — this is the docs hub for FOOSIEngine. Use the links below to jump to
 - [Beginner guide](beginner.md)
 - [Object system & prototypes](objects.md)
 - [Scene file format & Scene manager](scene.md)
+- [UI & GuiLayer](UI.md)
 - [Input listeners (mouse & keyboard)](input.md)
 - [Render pipeline](render.md)
 - [Game-side helpers (engine_api)](ENGINE_FUNCTIONS.md)

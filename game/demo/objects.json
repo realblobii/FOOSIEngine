@@ -20,7 +20,16 @@
             "textures": {
                 "default": "demo/player.png"
             }
+        },
+        {
+            "obj_class": "ui",
+            "obj_subclass": "text",
+            "properties": {
+                "text": "Hello UI",
+                "size": 24,
+                "nx": 0.05,
+                "ny": 0.05
+            }
         }
-        
     ]
 }

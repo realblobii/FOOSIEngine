@@ -1,6 +1,7 @@
 #include "engine/render/renderm.h"
 #include "engine/render/render_layer.h"
 #include "engine/render/isometric_layer.h"
+#include "engine/foogui/foogui.h"
 #include <algorithm>
 #include <cstring> // memcpy
 
@@ -56,6 +57,15 @@ float renderPipeline::screenToNDCy(int screenY) {
     return 1.0f - (2.0f * float(screenY) / float(engine->virt_sy));
 }
 
+void renderPipeline::addTextToUI(const std::string& txt, float ndc_x, float ndc_y, const std::string& font, int pxSize, bool persistent) {
+    // forward to first GuiLayer instance (if any)
+    for (auto &layer : layers) {
+        if (!layer) continue;
+        auto g = dynamic_cast<foogui::GuiLayer*>(layer.get());
+        if (g) { g->addTextAtNDC(txt, ndc_x, ndc_y, font, pxSize, persistent); return; }
+    }
+    std::cerr << "[renderPipeline] Warning: no GuiLayer found to add UI text" << std::endl;
+}
 
 
 // Append object vertices to world verts using the subtexture UVs and depth

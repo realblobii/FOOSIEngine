@@ -98,6 +98,8 @@
             }
         }
         virtual void Update(){}
+        // Delta-aware update: default implementation calls legacy Update().
+        virtual void UpdateDelta(float dt) { Update(); }
     private:
         std::unordered_map<std::string, PropertySetter> propertySetters;
 

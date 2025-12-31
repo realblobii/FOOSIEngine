@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <cstdint>
 
 #include "engine/coreclass.h"
 
@@ -54,7 +55,8 @@ public:
     void render();
     void clean();
     void printFPS();
-    void getDeltaT();
+    float getDeltaT();
+    float getFPS() const;
     
     /* Texture* loadTexture(const std::string& filename, int x = 0, int y = 0,
                          int width = 0, int height = 0);
@@ -84,6 +86,14 @@ private:
     //std::vector<Texture*> textures; 
     //std::unordered_map<std::string, Texture*> textureCache;  */
     SDL_GLContext glContext;
+
+    // Timing (delta-time / FPS)
+    uint64_t lastCounter = 0;
+    double perfFreq = 1.0;
+    float deltaTime = 0.0f;
+    uint64_t fpsTimerStart = 0;
+    int fpsCount = 0;
+    float fps = 0.0f;
 };
 
 #endif // ENGINEM_H

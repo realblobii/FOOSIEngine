@@ -49,7 +49,6 @@ void* ft2gl_load_font(const std::string& path) {
     auto try_load = [&](const std::string &p) -> FTFont* {
         FTFont* f = new FTFont();
         if (FT_New_Face(g_ft->lib, p.c_str(), 0, &f->face) == 0) {
-            std::cout << "ft2gl: loaded font: " << p << std::endl;
             return f;
         }
         delete f;
@@ -61,16 +60,13 @@ void* ft2gl_load_font(const std::string& path) {
     // Use POSIX directory iteration to avoid depending on <filesystem>
 
     // Print current working directory for diagnostics
-    char cwdBuf[PATH_MAX];
-    if (getcwd(cwdBuf, sizeof(cwdBuf))) {
-        std::cerr << "ft2gl: cwd=" << cwdBuf << std::endl;
-    }
 
+    // Prefer fonts located in the game/demo/fonts directory when running with CWD=game
     std::vector<std::string> searchDirs = {
-        "../engine/foogui/fonts",
+        "./demo/fonts", // prefer demo relative path when running from game/
+        "./fonts",
         "../addons/foogui/fonts",
         "addons/foogui/fonts",
-        "./fonts",
         "/usr/share/fonts/truetype",
         "/usr/share/fonts"
     };
@@ -86,7 +82,6 @@ void* ft2gl_load_font(const std::string& path) {
 
     // If user provided a path (absolute, relative or filename), try sensible candidates
     if (!path.empty()) {
-        std::cerr << "ft2gl: requested font path='" << path << "'" << std::endl;
         // Try as absolute path
         if (path.size() > 0 && path[0] == '/') {
             if (FTFont* f = try_load_path(path)) return f;
@@ -100,7 +95,7 @@ void* ft2gl_load_font(const std::string& path) {
             if (FTFont* f = try_load_path(candidate)) return f;
         }
         // Try basename under search dirs
-        size_t pos = path.find_last_of('/\\');
+        size_t pos = path.find_last_of("/\\");
         std::string base = (pos == std::string::npos) ? path : path.substr(pos+1);
         for (const auto &dpath : searchDirs) {
             std::string candidate2 = dpath + "/" + base;

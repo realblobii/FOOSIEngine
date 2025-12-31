@@ -20,9 +20,11 @@ theme:
 nav:
   - Home: index.md
   - Engine: engine.md
+  - UI: UI.md
   - Objects: objects.md
+  - Scene: scene.md
   - Input: input.md
   - Render: render.md
-  - API: ENGINE_FUNCTIONS.md
+  - Engine API: ENGINE_FUNCTIONS.md
   - Build: build.md
   - Conventions: conventions.md

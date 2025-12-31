@@ -4,6 +4,12 @@
     OBJECT grass tile.grass 4 5 0;
     OBJECT grass tile.grass 5 4 0;
     OBJECT grass tile.grass 4 4 0;
+    UI hello_text ui.text -0.8 -0.9
+    [
+        text "Hello, world!";
+        font "demo/fonts/DMSans.ttf";
+        size 24;
+    ];
     SCENE bob.fscn 4.5 4.5 1;
 };
 #ENDSCN

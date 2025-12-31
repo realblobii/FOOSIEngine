@@ -79,6 +79,7 @@ sceneData sceneManager::loadScene(
     // Stack to track parent objects for nested blocks
     std::vector<Object*> parentStack;
     Object* mostRecentObj = nullptr;
+    bool inPropBlock = false; // true while parsing lines inside [...] property blocks
 
     while (std::getline(inFile, line)) {
         line = trim(line);
@@ -103,6 +104,10 @@ sceneData sceneManager::loadScene(
             }
             continue;
         }
+
+        // Property block delimiters using square brackets: properties apply to the current mostRecentObj
+        if (line == "[") { inPropBlock = true; continue; }
+        if (line == "]" || line == "];") { inPropBlock = false; if (line == "];") mostRecentObj = nullptr; continue; }
 
         bool endsWithSemicolon = false;
         if (line.back() == ';') {
@@ -144,6 +149,46 @@ sceneData sceneManager::loadScene(
             sData.scene_obj_ids.push_back(obj->id);
 
             mostRecentObj = obj;
+            if (endsWithSemicolon) {
+                mostRecentObj = nullptr;
+            }
+        }
+
+        // ───────── UI (uses NDC coords and square-bracket properties) ─────────
+        else if (cmd == "UI") {
+            std::string clsdot;
+            float nx = 0.0f, ny = 0.0f;
+            std::string name;
+
+            if (!(iss >> name >> clsdot >> nx >> ny))
+                continue;
+
+            auto dot = clsdot.find('.');
+            std::string obj_class    = (dot == std::string::npos) ? clsdot : clsdot.substr(0, dot);
+            std::string obj_subclass = (dot == std::string::npos) ? ""      : clsdot.substr(dot + 1);
+
+            Object* obj = Instantiate(
+                obj_class,
+                obj_subclass,
+                name,
+                0.0f, 0.0f, 0.0f
+            );
+
+            if (!obj) continue;
+
+            // Apply NDC coords directly when this is a UIText_OBJ
+            if (auto *t = dynamic_cast<UIText_OBJ*>(obj)) {
+                t->nx = nx;
+                t->ny = ny;
+            }
+
+            // Add as child to the current parent (top of stack or root scene)
+            Object* parent = parentStack.empty() ? scnObj : parentStack.back();
+            engine->objMgr->addChild(parent, obj);
+            sData.scene_obj_ids.push_back(obj->id);
+
+            mostRecentObj = obj;
+            // Do not clear mostRecentObj here — the property block may follow in square brackets
             if (endsWithSemicolon) {
                 mostRecentObj = nullptr;
             }
@@ -222,6 +267,41 @@ sceneData sceneManager::loadScene(
                 mostRecentObj = nullptr;
             }
         }
+        else {
+            // Treat as a per-object property assignment when inside an object or property block.
+            // Only apply if we have a current object context.
+            if (mostRecentObj && (inPropBlock || true)) {
+                // `cmd` is the property name; the rest of the line is the value
+                std::string rest;
+                std::getline(iss, rest);
+                rest = trim(rest);
+
+                Json::Value props;
+                // If it's a quoted string, preserve as string
+                if (rest.size() >= 2 && rest.front() == '"' && rest.back() == '"') {
+                    props[cmd] = rest.substr(1, rest.size() - 2);
+                } else {
+                    // Try integer then float, else string
+                    try {
+                        size_t pos = 0;
+                        int iv = std::stoi(rest, &pos);
+                        if (pos == rest.size()) {
+                            props[cmd] = iv;
+                        } else {
+                            float fv = std::stof(rest);
+                            props[cmd] = fv;
+                        }
+                    } catch (...) {
+                        // fallback: raw string
+                        props[cmd] = rest;
+                    }
+                }
+                mostRecentObj->applyProperties(props);
+                if (endsWithSemicolon && !inPropBlock) {
+                    mostRecentObj = nullptr;
+                }
+            }
+        }
     }
 
     inFile.close();
@@ -292,6 +372,39 @@ static void write_object_recursive(std::ostream &out, Object *obj, Object *scene
     float rz = obj->z - sceneRoot->z;
 
     auto &children = obj->getChildren();
+    // Special-case ui.text: use `UI` operation with NDC coords and square-bracket properties
+    if (auto *t = dynamic_cast<UIText_OBJ*>(obj)) {
+        // Write header: UI <name> <class.subclass> <nx> <ny>
+        out << indent_str << "UI " << obj->objName << " " << fullcls << " ";
+        out << std::fixed << std::setprecision(3) << (t->nx >= 0.0f ? t->nx : 0.0f) << " " << (t->ny >= 0.0f ? t->ny : 0.0f) << "\n";
+        out << std::defaultfloat;
+
+        // Properties in square brackets
+        out << indent_str << "[\n";
+        auto escape = [](const std::string &s){
+            std::string r; r.reserve(s.size());
+            for (char c : s) { if (c == '"') r += "\\\""; else r += c; }
+            return r;
+        };
+        out << indent_str << "    text \"" << escape(t->text) << "\";\n";
+        if (!t->font.empty()) out << indent_str << "    font \"" << t->font << "\";\n";
+        out << indent_str << "    size " << t->size << ";\n";
+        out << indent_str << "]";
+
+        // If there are children, write them in a following { } block
+        if (children.empty()) {
+            out << ";\n";
+        } else {
+            out << "\n";
+            out << indent_str << "{\n";
+            for (auto *c : children) {
+                write_object_recursive(out, c, sceneRoot, indent+4);
+            }
+            out << indent_str << "};\n";
+        }
+        return;
+    }
+
     if (children.empty()) {
         out << indent_str << "OBJECT " << fullcls << " " << std::fixed << std::setprecision(3) << rx << " " << ry << " " << rz << ";\n";
         out << std::defaultfloat;

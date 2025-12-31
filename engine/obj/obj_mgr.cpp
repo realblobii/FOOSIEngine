@@ -242,7 +242,10 @@ Object* objManager::instantiate(const std::string& obj_class,
     }
 
     // Resolve texture using current texref (properties may have changed texref)
-    obj->resolveTexture(*this);
+    // UI objects don't use engine texture resolution, so skip resolve for ui class
+    if (obj->obj_class != "ui") {
+        obj->resolveTexture(*this);
+    }
 
     registry.push_back(std::move(obj));
     Object* objPtr = registry.back().get();

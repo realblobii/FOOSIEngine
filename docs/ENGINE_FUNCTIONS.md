@@ -1,5 +1,10 @@
 # FOOSIEngine — Engine API Reference
 
+Location: `game/engine_api.h`, `engine/enginem.h`
+
+Purpose
+- Reference for game-facing helper functions and notable engine APIs that game code commonly calls.
+
 This document summarizes the public/usable engine functions and common integration points. It's intended for engine users and script authors (game code in `game/`) and focuses on the functions that existing game code calls.
 
 ## Key components (high level)
@@ -31,7 +36,8 @@ Public members and usage:
   - Call once per frame before `update()`.
 
 - `void update()`
-  - Calls every registry object's `Update()` and then ticks input listeners (this invokes Hold handlers). Also calls the global `Update()` hook from `game/main.cpp`.
+  - Computes per-frame delta time and FPS, then calls each registry object's `UpdateDelta(float dt)` (default implementation calls the legacy `Update()` to preserve backwards compatibility), ticks input listeners (this invokes Hold handlers), and finally calls the global `Update()` hook from `game/main.cpp`.
+  - `Engine` exposes `float getDeltaT()` and `float getFPS()` to access the last frame's delta and the current FPS estimate respectively. `getDeltaT()` is the recommended way for object updates and movement to be frame-rate independent.
   - Call each frame to progress game state.
 
 - `void render()`
@@ -138,12 +144,44 @@ See `engine/render/*`. The `renderPipeline` collects objects and textures into a
 
 ## Game-side helpers (game/engine_api.h)
 
+Location: `game/engine_api.h`
+
 Includes small inline wrappers:
 
 -- `Object* Instantiate(const string &class, const string &subclass, float x, float y, float z)` — script-facing helper that instantiates a prototype; prefer this over calling engine internals.
 
+-- `void UIAddTextAtNDC(const string &text, float ndc_x, float ndc_y, const string &font = "", int pxSize = 24, bool persistent = false)` — Adds a programmatic UI text entry to the GuiLayer at normalized device coordinates (NDC in [-1..1]). Use `persistent=true` to keep the entry until explicitly removed.
+
+-- `Object* InstantiateUIText(const string &text, float ndc_x, float ndc_y, const string &font = "", int size = 24, const string &instName = "")` — Convenience helper that creates a persistent `ui.text` object and returns it for later manipulation. If `instName` is empty a unique `ui_text_<n>` name is generated.
+
+Usage examples
+
+```cpp
+// Programmatic transient UI text at NDC (-1..1)
+UIAddTextAtNDC("Lives: 3", -0.9f, 0.9f, "demo/fonts/DMSans.ttf", 20);
+
+// Persistent object-backed label that can be updated later
+Object* score = InstantiateUIText("Time: 0", -0.9f, 0.8f, "demo/fonts/DMSans.ttf", 24, "score_label");
+// later update:
+UIText_OBJ* ul = dynamic_cast<UIText_OBJ*>(score);
+if (ul) ul->text = "Time: 1";
+```
 
 Include `game/main.h` before `game/engine_api.h` to access the global `engine` pointer.
+
+Example usage:
+
+```cpp
+// Programmatic transient UI text at NDC (-1..1)
+UIAddTextAtNDC("Lives: 3", -0.9f, 0.9f, "demo/fonts/DMSans.ttf", 20);
+
+// Persistent object-backed label that can be updated later
+Object* score = InstantiateUIText("Time: 0", -0.9f, 0.8f, "demo/fonts/DMSans.ttf", 24, "score_label");
+// later update:
+UIText_OBJ* ul = dynamic_cast<UIText_OBJ*>(score);
+if (ul) ul->text = "Time: 1";
+```
+
 
 ---
 

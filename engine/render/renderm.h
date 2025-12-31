@@ -52,6 +52,9 @@ public:
     // manually rebuild atlas (call if you add sprites after start)
     void rebuildAtlas();
 
+    // convenience: add text to the UI layer (NDC coords)
+    void addTextToUI(const std::string& txt, float ndc_x, float ndc_y, const std::string& font = "", int pxSize = 24, bool persistent = false);
+
 private:
     Engine* engine = nullptr;
     Shader defaultShader;

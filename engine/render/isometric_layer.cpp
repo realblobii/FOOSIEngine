@@ -48,7 +48,7 @@ void IsometricLayer::render(renderPipeline* pipeline) {
 
     // Sort objects in isometric order (include objects without texture; they will use a placeholder)
     std::vector<Object*> sorted;
-    for (auto& obj : *registry) if (obj && obj->id != 0 && !obj->invis) sorted.push_back(obj.get());
+    for (auto& obj : *registry) if (obj && obj->id != 0 && !obj->invis && obj->obj_class != "ui") sorted.push_back(obj.get());
     std::sort(sorted.begin(), sorted.end(), [](Object* a, Object* b){
         if (a->z != b->z) return a->z < b->z;
         if (a->y != b->y) return a->y < b->y;
