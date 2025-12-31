@@ -288,6 +288,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../UI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objects/" class="md-nav__link">
         
   
@@ -296,6 +323,33 @@
     
   
     Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scene/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
   
 
     
@@ -351,6 +405,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Render
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -367,6 +439,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#guilayer-fonts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GuiLayer &amp; fonts
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -386,7 +488,7 @@
   <span class="md-ellipsis">
     
   
-    API
+    Engine API
   
 
     
@@ -473,6 +575,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#guilayer-fonts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GuiLayer &amp; fonts
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -490,13 +611,25 @@
 
 <h1 id="render-pipeline">Render pipeline</h1>
 <p>Location: <code>engine/render/*</code></p>
+<p>Purpose
+- Describe the rendering pipeline and the GuiLayer which handles screen-space UI rendering.</p>
 <p>Overview
 - The render pipeline collects textures and objects and builds a texture atlas for batched draws.
 - <code>renderPipeline::renderAll()</code> draws the current scene using the atlas and per-object transforms.</p>
+<p>Usage &amp; GuiLayer
+- The GuiLayer handles screen-space UI rendering (text labels, programmatic UI entries) and uses FreeType to rasterize font glyphs into a glyph atlas.
+- Fonts are discovered starting in the working <code>game/</code> directory under <code>demo/fonts</code> (the engine assumes the game is run with CWD=<code>game</code>). You can specify a font path explicitly (e.g., <code>demo/fonts/DMSans.ttf</code>) when creating <code>ui.text</code> objects or calling <code>UIAddTextAtNDC()</code>.
+- The GuiLayer caches font handles and only loads fonts/glyphs once; glyphs are added to the atlas only when first needed to minimize texture churn and CPU work.</p>
 <p>Notes
 - The renderer is OpenGL 3.3 core-profile oriented (GLAD + SDL_GL context created in <code>Engine::Init</code>).
 - Textures are loaded via <code>Texture</code> helpers and combined into an atlas. If you add textures, ensure their lifetime is managed by the pipeline.
 - The rendering subsystem is lower-level; prefer high-level helpers in game code when available.</p>
+<h2 id="guilayer-fonts">GuiLayer &amp; fonts</h2>
+<ul>
+<li>The GuiLayer handles screen-space UI rendering (text labels, programmatic UI entries) and uses FreeType to rasterize font glyphs into a glyph atlas.</li>
+<li>Fonts are discovered starting in the working <code>game/</code> directory under <code>demo/fonts</code> (the engine assumes the game is run with CWD=<code>game</code>). You can specify a font path explicitly (e.g., <code>demo/fonts/DMSans.ttf</code>) when creating <code>ui.text</code> objects or calling <code>UIAddTextAtNDC()</code>.</li>
+<li>The GuiLayer caches font handles and only loads fonts/glyphs once; glyphs are added to the atlas only when first needed to minimize texture churn and CPU work.</li>
+</ul>
 
 
 

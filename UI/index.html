@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://realblobii.github.io/FOOSIEngine/objects/">
+        <link rel="canonical" href="https://realblobii.github.io/FOOSIEngine/UI/">
       
       
-        <link rel="prev" href="../UI/">
+        <link rel="prev" href="../engine/">
       
       
-        <link rel="next" href="../scene/">
+        <link rel="next" href="../objects/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Objects - FOOSIEngine Docs</title>
+        <title>UI - FOOSIEngine Docs</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#object-system-prototypes" class="md-skip">
+        <a href="#ui-guilayer" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Objects
+              UI
             
           </span>
         </div>
@@ -285,10 +285,19 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../UI/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -304,6 +313,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -312,37 +322,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Objects
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../objects/" class="md-nav__link">
         
   
   
@@ -358,187 +341,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#key-concepts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key concepts
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key concepts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#-classes-vs-subclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        - Classes vs Subclasses:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#factory-registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Factory &amp; Registry
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prototype-properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prototype properties
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Prototype properties">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#engine-validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Engine validation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-prototype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example prototype:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#extending-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Extending classes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui-objects-uitext" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        UI objects (ui.text)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#object-manipulation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Object Manipulation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Object Manipulation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#creation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Creation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hierarchy-manipulation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hierarchy Manipulation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Registry
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-this-design" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why this design
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -725,175 +527,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#key-concepts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key concepts
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key concepts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#-classes-vs-subclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        - Classes vs Subclasses:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#factory-registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Factory &amp; Registry
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prototype-properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prototype properties
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Prototype properties">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#engine-validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Engine validation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-prototype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example prototype:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#extending-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Extending classes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui-objects-uitext" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        UI objects (ui.text)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#object-manipulation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Object Manipulation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Object Manipulation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#creation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Creation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hierarchy-manipulation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hierarchy Manipulation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Registry
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-this-design" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why this design
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -909,89 +542,76 @@
 
 
 
-<h1 id="object-system-prototypes">Object system &amp; prototypes</h1>
-<p>Location: <code>engine/obj/*</code>, <code>game/assets/objects.json</code></p>
+<h1 id="ui-guilayer">UI &amp; GuiLayer</h1>
+<p>Location: <code>engine/foogui/*</code>, <code>game/engine_api.h</code>, <code>engine/obj/ui_text_oclass.h</code></p>
 <p>Purpose
-- Describe object classes, prototype-driven properties (<code>objects.json</code>), object creation, and the runtime registry.</p>
-<h2 id="key-concepts">Key concepts</h2>
-<h3 id="-classes-vs-subclasses">- Classes vs Subclasses:</h3>
+- Central documentation for the UI subsystem: the GuiLayer, <code>ui.text</code> object, programmatic UI APIs, and scene serialization for UI elements.</p>
+<p>Overview
+- The GuiLayer provides screen-space rendering functionality independent of the world-space rendering pipeline. It handles programmatic UI entries (transient or persistent), renders <code>ui.text</code> object instances from the object registry, and manages font rasterization and glyph atlases.</p>
+<p>Key concepts
+- Programmatic entries: quick transient or persistent pieces of text you can add at runtime via <code>UIAddTextAtNDC()</code>.
+- Object-backed UI: persistent UI elements created as <code>ui.text</code> objects (via scene files or <code>InstantiateUIText()</code>), which can be modified at runtime and serialized when saving scenes.
+- Font handling: GuiLayer discovers fonts under <code>game/demo/fonts</code> by default (engine assumes the game runs with CWD=<code>game</code>). You may also supply an explicit font path when creating UI text.</p>
+<p>API &amp; usage</p>
 <ul>
-<li>A <em>class</em> maps to a C++ type (registered via <code>ObjectFactory::registerClass()</code>).</li>
-<li>A <em>subclass</em> is a JSON prototype: data-driven variant of a class (textures, properties).</li>
+<li>UIAddTextAtNDC</li>
+<li>Signature: <code>void UIAddTextAtNDC(const std::string&amp; text, float ndc_x, float ndc_y, const std::string&amp; font = "", int pxSize = 24, bool persistent = false)</code></li>
+<li>Adds text at NDC coordinates (range -1..1). If <code>persistent</code> is true the entry remains until removed; otherwise it's transient for the current frame.</li>
+<li>
+<p>Example: <code>UIAddTextAtNDC("Lives: 3", -0.9f, 0.9f, "demo/fonts/DMSans.ttf", 20);</code></p>
+</li>
+<li>
+<p>InstantiateUIText</p>
+</li>
+<li>Signature: <code>Object* InstantiateUIText(const std::string&amp; text, float ndc_x, float ndc_y, const std::string&amp; font = "", int size = 24, const std::string&amp; instName = "")</code></li>
+<li>Creates an object-backed <code>ui.text</code> instance registered in the engine's object manager. Returns the created object for later manipulation. If <code>instName</code> is empty a unique <code>ui_text_&lt;n&gt;</code> name is generated.</li>
+<li>Example:
+    <code>cpp
+    Object* label = InstantiateUIText("Score: 0", -0.9f, 0.8f, "demo/fonts/DMSans.ttf", 24, "score_label");
+    UIText_OBJ* ul = dynamic_cast&lt;UIText_OBJ*&gt;(label);
+    if (ul) ul-&gt;text = "Score: 1";</code></li>
 </ul>
-<h2 id="factory-registry">Factory &amp; Registry</h2>
-<ul>
-<li><code>ObjectFactory::registerClass(name, creator)</code> registers class creators.</li>
-<li><code>objManager::instantiate(class, subclass, x,y,z)</code> creates an instance, assigns id/position, applies prototype properties (see below), and resolves textures. The instance is stored in <code>objManager::registry</code> and returned as a raw pointer (owned by the registry).</li>
-</ul>
-<h2 id="prototype-properties">Prototype <code>properties</code></h2>
-<ul>
-<li><code>game/assets/objects.json</code> may include a <code>properties</code> object per prototype.</li>
-<li><strong>Important</strong>: core engine-managed fields (<code>x</code>,<code>y</code>,<code>z</code>,<code>texref</code>) are ignored when set in prototypes. The engine will emit a warning and strip them.</li>
-</ul>
-<h3 id="engine-validation">Engine validation</h3>
-<ul>
-<li>The engine requires that any <code>OBJECT</code> referenced in scene files corresponds to a prototype present in <code>game/assets/objects.json</code> (i.e. valid <code>obj_class</code> and <code>obj_subclass</code>). If a prototype is missing, <code>Instantiate()</code> will return <code>nullptr</code> and the loader will skip the entry. Ensure your scene files only reference defined subclasses (for example: <code>tile.grass</code>, <code>tile.half_grass</code>, <code>tile.pTest</code>).</li>
-<li>To expose prototype-driven variables, classes must register named property setters:</li>
-<li>In a class constructor, call <code>registerFloatProperty("speed", speed);</code> or <code>registerStringProperty("team", teamName);</code></li>
-<li>For custom parsing, use <code>registerProperty("loot", [this](const Json::Value &amp;v){ /* parse */ });</code></li>
-</ul>
-<h3 id="example-prototype">Example prototype:</h3>
-<pre><code class="language-json">{
-  &quot;obj_class&quot;: &quot;tile&quot;,
-  &quot;obj_subclass&quot;: &quot;pPlayer&quot;,
-  &quot;textures&quot;: { &quot;default&quot;: &quot;assets/player.png&quot; },
-  &quot;properties&quot;: { &quot;speed&quot;: 2.0 }
-}
+<p><code>ui.text</code> object (properties)
+- Class: <code>UIText_OBJ</code> (registered as <code>ui.text</code>)
+- Common properties supported in prototypes and scene <code>[...]</code> blocks:
+  - <code>text</code> (string)
+  - <code>font</code> (string) — path to a TTF file or empty to use the default discovered font
+  - <code>size</code> (int) — pixel font size
+  - <code>nx</code>, <code>ny</code> (float) — normalized coordinates (0..1) that map to NDC for placement. If provided, they are preferred over <code>sx</code>/<code>sy</code>.
+  - <code>sx</code>, <code>sy</code> (float) — pixel coordinates (screen space)
+  - <code>r</code>, <code>g</code>, <code>b</code>, <code>a</code> (float) — color components (0..1)</p>
+<p>Notes &amp; details
+- <code>ui.*</code> objects do not participate in standard engine texture resolution; GuiLayer handles rendering via glyph atlases.
+- Fonts are cached to avoid repeated loading; glyphs are generated on demand and added to the atlas.
+- Coordinates: the scene <code>UI</code> syntax expects NDC (-1..1), but the object properties <code>nx</code>/<code>ny</code> stored as 0..1 internally for convenience.</p>
+<p>Scene serialization &amp; UI syntax
+- Use the <code>UI</code> operation in <code>.fscn</code> files to place UI objects at NDC coordinates and provide properties in square brackets:</p>
+<pre><code>UI label ui.text 0.05 0.95
+[
+    text &quot;Hello, world!&quot;;
+    font &quot;demo/fonts/DMSans.ttf&quot;;
+    size 24;
+];
 </code></pre>
-<h2 id="extending-classes">Extending classes</h2>
 <ul>
-<li>Override <code>applyProperties</code> only if you need custom behavior; the preferred pattern is to register setters in the constructor.</li>
+<li><code>sceneManager::saveScene()</code> will write <code>ui.text</code> objects using this form (properties in <code>[...]</code>). Children (if any) remain written in a following <code>{ ... }</code> block.</li>
 </ul>
-<h2 id="ui-objects-uitext">UI objects (ui.text)</h2>
+<p>Examples
+- Transient programmatic:</p>
+<pre><code>UIAddTextAtNDC(&quot;Hello&quot;, 0.0f, 0.0f);
+</code></pre>
 <ul>
-<li>The engine includes a built-in <code>ui.text</code> subclass for screen-space labels that are rendered by the GuiLayer (not as world-space textures).</li>
-<li>Class: <code>UIText_OBJ</code> (registered as <code>ui.text</code>). Properties available in prototypes and scene files:</li>
-<li><code>text</code> (string) — the literal text to display.</li>
-<li><code>font</code> (string) — path to a TTF file (e.g., <code>demo/fonts/DMSans.ttf</code>) or empty to use the default discovered font.</li>
-<li><code>size</code> (int) — pixel font size.</li>
-<li><code>nx</code>, <code>ny</code> (float) — normalized (0..1) coordinates mapping to NDC for screen placement (preferred for <code>UI</code> syntax). If you supply <code>sx</code>/<code>sy</code> instead, those are treated as pixel positions.</li>
-<li><code>sx</code>, <code>sy</code> (float) — pixel coordinates (screen space); used if <code>nx/ny</code> are negative.</li>
-<li>
-<p><code>r</code>, <code>g</code>, <code>b</code>, <code>a</code> (float) — color components in [0..1].</p>
-</li>
-<li>
-<p>Important: <code>ui.*</code> objects do not attempt engine texture resolution (they are not looked up in <code>objects.json</code> texture maps). The GuiLayer manages font rendering and glyph atlases directly.</p>
-</li>
-<li>
-<p>Creation: use scene <code>UI</code> syntax (see <code>docs/scene.md</code>) or the convenience helper <code>InstantiateUIText()</code> in <code>game/engine_api.h</code>.</p>
-</li>
+<li>Persistent object-backed (scene):</li>
 </ul>
-<h2 id="object-manipulation">Object Manipulation</h2>
-<h3 id="creation">Creation</h3>
-<p>-- <code>Object* Instantiate(const string &amp;class, const string &amp;subclass, float x, float y, float z)</code>
-    - Script-friendly wrapper for instantiating prototypes. Prefer calling this helper from game code instead of accessing engine internals.
-    - Returns a raw pointer owned by the engine registry.</p>
-<h3 id="hierarchy-manipulation">Hierarchy Manipulation</h3>
-<p>-- <code>void objManager::addChild(Object* parent, Object* child)</code>
-   - Makes <code>child</code> a child of <code>parent</code> and removes libks between <code>child</code> and previous parents.
-  -- <code>void objManager::removeChild(Object* parent, Object* child)</code>
-     - Makes <code>child</code> no longer a child of <code>parent</code>.
-     - <code>child</code> becomes a child of the <code>ROOT</code> object.
-  -- <code>Object* Object::getParent()</code>
-   - Gets the parent of the <code>Object</code> chosen. </p>
-<h3 id="registry">Registry</h3>
-<p>-- <code>void objManager::printTree(Object* obj, const std::string&amp; prefix = "", bool isLast = true)</code>
-   -  Prints out entire hierarchy from <code>obj</code>.
-  -- <code>void objManager::printRegistry() const</code>
-   - Prints out entire registry, ignoring hierarchy.
-  -- <code>Object* objManager::getRoot() const</code>
-   - Returns the <code>ROOT</code> object, parent of all other objects. </p>
-<h2 id="why-this-design">Why this design</h2>
-<ul>
-<li>Keeps engine-managed concerns separated from data-driven prototype properties.</li>
-<li>Enables safe, explicit exposure of variables to JSON while preventing accidental overriding of instance placement or texture resolution.</li>
-</ul>
+<pre><code>UI score_label ui.text -0.9 0.9
+[
+    text &quot;Score: 0&quot;;
+    size 20;
+];
+</code></pre>
+<p>Troubleshooting
+- If text does not appear, verify the font file path (relative to <code>game/</code>), and ensure glyphs for the characters are rasterized (they are added on-demand when first used).
+- For layout issues, confirm whether <code>nx/ny</code> (preferred) or <code>sx/sy</code> are being used; <code>nx/ny</code> are normalized, <code>sx/sy</code> are pixels.</p>
 
 
 

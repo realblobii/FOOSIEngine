@@ -25,7 +25,7 @@
     
     
       
-        <title>API - FOOSIEngine Docs</title>
+        <title>Engine API - FOOSIEngine Docs</title>
       
     
     
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API
+              Engine API
             
           </span>
         </div>
@@ -288,6 +288,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../UI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objects/" class="md-nav__link">
         
   
@@ -296,6 +323,33 @@
     
   
     Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scene/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
   
 
     
@@ -385,7 +439,7 @@
   <span class="md-ellipsis">
     
   
-    API
+    Engine API
   
 
     
@@ -403,7 +457,7 @@
   <span class="md-ellipsis">
     
   
-    API
+    Engine API
   
 
     
@@ -766,6 +820,9 @@
 
 
 <h1 id="foosiengine-engine-api-reference">FOOSIEngine — Engine API Reference</h1>
+<p>Location: <code>game/engine_api.h</code>, <code>engine/enginem.h</code></p>
+<p>Purpose
+- Reference for game-facing helper functions and notable engine APIs that game code commonly calls.</p>
 <p>This document summarizes the public/usable engine functions and common integration points. It's intended for engine users and script authors (game code in <code>game/</code>) and focuses on the functions that existing game code calls.</p>
 <h2 id="key-components-high-level">Key components (high level)</h2>
 <ul>
@@ -802,7 +859,8 @@
 <li>
 <p><code>void update()</code></p>
 </li>
-<li>Calls every registry object's <code>Update()</code> and then ticks input listeners (this invokes Hold handlers). Also calls the global <code>Update()</code> hook from <code>game/main.cpp</code>.</li>
+<li>Computes per-frame delta time and FPS, then calls each registry object's <code>UpdateDelta(float dt)</code> (default implementation calls the legacy <code>Update()</code> to preserve backwards compatibility), ticks input listeners (this invokes Hold handlers), and finally calls the global <code>Update()</code> hook from <code>game/main.cpp</code>.</li>
+<li><code>Engine</code> exposes <code>float getDeltaT()</code> and <code>float getFPS()</code> to access the last frame's delta and the current FPS estimate respectively. <code>getDeltaT()</code> is the recommended way for object updates and movement to be frame-rate independent.</li>
 <li>
 <p>Call each frame to progress game state.</p>
 </li>
@@ -910,9 +968,32 @@ registerFloatProperty(&quot;speed&quot;, speed);
 <p>See <code>engine/render/*</code>. The <code>renderPipeline</code> collects objects and textures into an atlas and renders them. Use <code>engine-&gt;rPipeline</code> sparingly — prefer higher-level helpers.</p>
 <hr />
 <h2 id="game-side-helpers-gameengine_apih">Game-side helpers (game/engine_api.h)</h2>
+<p>Location: <code>game/engine_api.h</code></p>
 <p>Includes small inline wrappers:</p>
 <p>-- <code>Object* Instantiate(const string &amp;class, const string &amp;subclass, float x, float y, float z)</code> — script-facing helper that instantiates a prototype; prefer this over calling engine internals.</p>
+<p>-- <code>void UIAddTextAtNDC(const string &amp;text, float ndc_x, float ndc_y, const string &amp;font = "", int pxSize = 24, bool persistent = false)</code> — Adds a programmatic UI text entry to the GuiLayer at normalized device coordinates (NDC in [-1..1]). Use <code>persistent=true</code> to keep the entry until explicitly removed.</p>
+<p>-- <code>Object* InstantiateUIText(const string &amp;text, float ndc_x, float ndc_y, const string &amp;font = "", int size = 24, const string &amp;instName = "")</code> — Convenience helper that creates a persistent <code>ui.text</code> object and returns it for later manipulation. If <code>instName</code> is empty a unique <code>ui_text_&lt;n&gt;</code> name is generated.</p>
+<p>Usage examples</p>
+<pre><code class="language-cpp">// Programmatic transient UI text at NDC (-1..1)
+UIAddTextAtNDC(&quot;Lives: 3&quot;, -0.9f, 0.9f, &quot;demo/fonts/DMSans.ttf&quot;, 20);
+
+// Persistent object-backed label that can be updated later
+Object* score = InstantiateUIText(&quot;Time: 0&quot;, -0.9f, 0.8f, &quot;demo/fonts/DMSans.ttf&quot;, 24, &quot;score_label&quot;);
+// later update:
+UIText_OBJ* ul = dynamic_cast&lt;UIText_OBJ*&gt;(score);
+if (ul) ul-&gt;text = &quot;Time: 1&quot;;
+</code></pre>
 <p>Include <code>game/main.h</code> before <code>game/engine_api.h</code> to access the global <code>engine</code> pointer.</p>
+<p>Example usage:</p>
+<pre><code class="language-cpp">// Programmatic transient UI text at NDC (-1..1)
+UIAddTextAtNDC(&quot;Lives: 3&quot;, -0.9f, 0.9f, &quot;demo/fonts/DMSans.ttf&quot;, 20);
+
+// Persistent object-backed label that can be updated later
+Object* score = InstantiateUIText(&quot;Time: 0&quot;, -0.9f, 0.8f, &quot;demo/fonts/DMSans.ttf&quot;, 24, &quot;score_label&quot;);
+// later update:
+UIText_OBJ* ul = dynamic_cast&lt;UIText_OBJ*&gt;(score);
+if (ul) ul-&gt;text = &quot;Time: 1&quot;;
+</code></pre>
 <hr />
 <h2 id="debugging-build-notes">Debugging &amp; build notes</h2>
 <ul>

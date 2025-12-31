@@ -14,7 +14,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../objects/">
+        <link rel="next" href="../UI/">
       
       
         
@@ -270,6 +270,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -287,6 +305,74 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#delta-time-updatedelta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta-time &amp; UpdateDelta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recent-additions-dec-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recent additions (Dec 2025)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -306,6 +392,33 @@
     
   
     Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scene/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
   
 
     
@@ -386,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    API
+    Engine API
   
 
     
@@ -473,6 +586,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#delta-time-updatedelta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta-time &amp; UpdateDelta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recent-additions-dec-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recent additions (Dec 2025)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -490,14 +633,29 @@
 
 <h1 id="engine-overview-and-lifecycle">Engine — overview and lifecycle</h1>
 <p>Location: <code>engine/enginem.h</code>, <code>engine/enginem.cpp</code></p>
+<p>Purpose
+- Describe Engine lifecycle, main responsibilities, and the public API you should call from game code.</p>
 <p>What it is
 - <code>Engine</code> is the runtime owner for the window, GL context, input listeners, object manager, and render pipeline.</p>
+<p>Usage
+- Call <code>Init()</code> once at startup, then per-frame call <code>handleEvents()</code>, <code>update()</code> and <code>render()</code>. Call <code>clean()</code> on shutdown.</p>
 <p>Important functions
 - <code>Init(const char* cfgPath = "foosiecfg.json")</code> — Boot the engine, create subsystems, set GL attributes, and read configuration from the JSON file in the working directory (see <code>game/foosiecfg.json</code> for options). Key config options include <code>virt_sx</code>, <code>virt_sy</code>, <code>fullscreen</code>, <code>tile_width</code>, <code>tile_height</code>, <code>atlas_size</code>, <code>scene_folder</code> (folder where <code>.fscn</code> scene files live), and <code>object_files</code> (array of prototype JSON files to load in addition to the always-loaded <code>engine/coreclass.json</code>).
 - <code>handleEvents()</code> — Polls SDL events and forwards to input listeners. Handles <code>SDL_QUIT</code>.
-- <code>update()</code> — Calls each registry object's <code>Update()</code>, ticks input listeners (hold handlers), and calls the global <code>Update()</code> hook (game-provided). Should be called once per frame.
-- <code>render()</code> — Runs <code>rPipeline-&gt;renderAll()</code> to draw the frame.
-- <code>clean()</code> — Tears down subsystems and quits SDL.</p>
+- <code>update()</code> — Computes per-frame delta-time and FPS, calls each registry object's <code>UpdateDelta(float dt)</code> (the default implementation calls <code>Update()</code> to preserve existing behavior), ticks input listeners (hold handlers), and calls the global <code>Update()</code> hook (game-provided). Should be called once per frame.</p>
+<h3 id="delta-time-updatedelta">Delta-time &amp; <code>UpdateDelta</code></h3>
+<ul>
+<li>The engine now computes a high-resolution delta time each frame via <code>SDL_GetPerformanceCounter()</code> / <code>SDL_GetPerformanceFrequency()</code> and exposes it via <code>Engine::getDeltaT()</code> (seconds, as <code>float</code>). Use this value for frame-rate independent updates (movement, animations, timers).</li>
+<li><code>Engine::getFPS()</code> returns the recent FPS estimate.</li>
+<li><code>Object</code> provides a <code>virtual void UpdateDelta(float dt)</code> method that defaults to calling the old <code>Update()</code> — existing objects continue to work unchanged. To migrate an object to use delta time, override <code>UpdateDelta</code> and use <code>dt</code> for movement/accumulators (e.g., <code>x += speed * dt</code>).</li>
+<li>
+<p>The engine clamps large <code>dt</code> values (&gt;0.25s) to avoid large jumps after pauses or when resuming from breakpoints.</p>
+</li>
+<li>
+<p><code>render()</code> — Runs <code>rPipeline-&gt;renderAll()</code> to draw the frame.</p>
+</li>
+<li><code>clean()</code> — Tears down subsystems and quits SDL.</li>
+</ul>
 <p>Fields you may use
 - <code>objManager* objMgr</code> — instantiate objects via <code>instantiate()</code> (prefer the wrapper <code>Instantiate()</code> in <code>game/engine_api.h</code>).
 - <code>mListener* mLnr</code>, <code>kListener* kLnr</code> — input listeners.
@@ -505,6 +663,14 @@
 <p>Notes
 - Prefer the lightweight wrappers in <code>game/engine_api.h</code> for scripts (no engine changes required).
 - <code>Engine::update()</code> calls input <code>tick()</code>; handlers that want per-frame hold behavior should register with <code>onKeyHold</code>/<code>onMouseHold</code>.</p>
+<h2 id="recent-additions-dec-2025">Recent additions (Dec 2025)</h2>
+<ul>
+<li>Delta-time support: <code>Engine</code> now computes a high-resolution <code>dt</code> per frame and exposes <code>getDeltaT()</code> / <code>getFPS()</code>, and objects can implement <code>UpdateDelta(float dt)</code> for frame-rate independent updates.</li>
+<li>UI text subsystem: <code>ui.text</code> class and GuiLayer programmatic APIs (<code>UIAddTextAtNDC</code>, <code>InstantiateUIText</code>) provide simple ways to show screen-space text in any font/size/position.</li>
+<li>Scene serialization: Added <code>UI</code> operation and square-bracket property blocks so UI elements can be persisted in <code>.fscn</code> scene files.</li>
+<li>Resource behavior: fonts are now discovered in <code>game/demo/fonts</code> by default; GuiLayer caches font handles and avoids repeated per-frame loads.</li>
+<li>Object instantiation: <code>ui.*</code> objects no longer participate in engine texture resolution (they're rendered by GuiLayer instead).</li>
+</ul>
 
 
 

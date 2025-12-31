@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://realblobii.github.io/FOOSIEngine/scene/">
       
       
+        <link rel="prev" href="../objects/">
+      
+      
+        <link rel="next" href="../input/">
       
       
         
@@ -21,7 +25,7 @@
     
     
       
-        <title>Scene file format & Scene manager - FOOSIEngine Docs</title>
+        <title>Scene - FOOSIEngine Docs</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Scene file format &amp; Scene manager
+              Scene
             
           </span>
         </div>
@@ -284,6 +288,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../UI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objects/" class="md-nav__link">
         
   
@@ -300,6 +331,180 @@
   
 
       </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#file-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syntax-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Syntax rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#child-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Child blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading behavior
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Loading behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-ui-syntax-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New UI syntax (UI)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saving-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes &amp; constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -372,7 +577,7 @@
   <span class="md-ellipsis">
     
   
-    API
+    Engine API
   
 
     
@@ -513,6 +718,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Loading behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-ui-syntax-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New UI syntax (UI)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -592,8 +814,8 @@
 <li>Lines are trimmed and empty lines ignored.</li>
 <li>Commands use an initial keyword and arguments separated by whitespace.</li>
 <li>Commands include:</li>
-<li><code>OBJECT &lt;class&gt;[.&lt;subclass&gt;] &lt;x&gt; &lt;y&gt; &lt;z&gt;</code> — instantiate an object at the integer coordinates.<ul>
-<li>If the line ends with <code>;</code> it is a leaf object. If the line is followed by a <code>{</code> block, the following objects become children of this object (see <em>Child blocks</em> below).</li>
+<li><code>OBJECT &lt;name&gt; &lt;class&gt;[.&lt;subclass&gt;] &lt;x&gt; &lt;y&gt; &lt;z&gt;</code> — instantiate an object with the specified instance <code>name</code> and prototype <code>class</code>/<code>subclass</code> at the given coordinates.<ul>
+<li>If the line ends with <code>;</code> it is a leaf object. If the line is followed by a <code>{</code> block, the following objects become children of this object (see <em>Child blocks</em> below). Note: the parser expects the <code>name</code> token first, then the <code>class.subclass</code> token.</li>
 </ul>
 </li>
 <li><code>SCENE &lt;path&gt; &lt;x&gt; &lt;y&gt; &lt;z&gt;</code> — create a reference to another scene file. The <code>path</code> should be a valid scene filename (e.g., <code>test2.fscn</code>). When loading, <code>SCENE</code> will load the referenced scene and attach its scene object as a child.</li>
@@ -623,6 +845,23 @@
 <li>Nested <code>SCENE</code> references are loaded recursively; the nested scene's root object is attached to the parent, and all object IDs from the nested load are aggregated into the calling scene's <code>sceneData</code>.</li>
 <li>All instantiated coordinates are the sum of the explicit coordinates and the <code>baseX</code>, <code>baseY</code>, <code>baseZ</code> offsets passed to <code>loadScene</code>.</li>
 </ul>
+<h3 id="new-ui-syntax-ui">New UI syntax (<code>UI</code>)</h3>
+<ul>
+<li><code>UI</code> is a new operation specifically for UI objects (e.g., <code>ui.text</code>) that are positioned in normalized device coordinates (NDC) instead of world-space x/y.</li>
+<li>Syntax: <code>UI &lt;name&gt; &lt;class&gt;[.&lt;subclass&gt;] &lt;nx&gt; &lt;ny&gt; [ &lt;properties&gt; ];</code> or the multi-line form:</li>
+</ul>
+<pre><code>UI my_label ui.text 0.05 0.95
+[
+    text &quot;Hello, world!&quot;;
+    font &quot;demo/fonts/DMSans.ttf&quot;;
+    size 24;
+];
+</code></pre>
+<ul>
+<li>The <code>&lt;nx&gt;</code> and <code>&lt;ny&gt;</code> are NDC coordinates in the range [-1..1]; for convenience the engine stores them internally as normalized [0..1] (i.e., <code>(ndc+1)/2</code>).</li>
+<li>Properties for <code>UI</code> objects are specified inside square brackets <code>[...]</code> and applied to the instantiated object with the same property parsing rules as object <code>{ ... }</code> blocks (see <em>Properties</em> below).</li>
+<li>Children (if any) remain specified with curly <code>{ ... }</code> blocks following the UI block.</li>
+</ul>
 <h2 id="saving-behavior">Saving behavior</h2>
 <ul>
 <li><code>sceneManager::saveScene(name)</code> serializes a scene back to a <code>.fscn</code> file in the scene folder.</li>
@@ -631,7 +870,8 @@
 <li>The header <code>#SCNDEF &lt;name&gt;</code> uses the scene's name without a <code>.fscn</code> suffix.</li>
 <li>Coordinates are written as integers relative to the saved scene's root object.</li>
 <li>Nested <code>Scene_OBJ</code> instances (child scenes) are written as <code>SCENE &lt;scene-name&gt;.fscn &lt;x&gt; &lt;y&gt; &lt;z&gt;;</code> and their children are intentionally not expanded in the file (a child scene is saved as a reference only).</li>
-<li>Objects are saved using the inline <code>{ ... };</code> child-block syntax for children.</li>
+<li><code>ui.text</code> objects and other UI objects are saved using the new <code>UI</code> syntax. Their visible properties (text, font, size, nx/ny) are written inside a square-bracket property block <code>[...]</code>. If the object has children, they are written in a following <code>{ ... }</code> block (children remain curly-braced).</li>
+<li>Other objects continue to use the existing <code>OBJECT</code> / <code>{ ... }</code> syntax for children.</li>
 </ul>
 <h2 id="notes-constraints">Notes &amp; constraints</h2>
 <ul>
