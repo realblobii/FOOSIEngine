@@ -7,11 +7,10 @@
 
 #include "engine/obj/obj.h"
 #include "engine/obj/obj_factory.h"
-#include "engine/obj/ui_base_oclass.h"
 
-// Simple UI text object class — instances are not rendered as textures;
-// GuiLayer's text pipeline will render them instead.
-class UIText_OBJ : public UIBase_OBJ {
+// Simple UI text object class — instances are not rendered in world space;
+// GuiLayer will pick them up and render into the UI pipeline instead.
+class UIText_OBJ : public Object {
 public:
     UIText_OBJ() {
         obj_class = "ui";
@@ -20,7 +19,12 @@ public:
         registerStringProperty("text", text);
         registerStringProperty("font", font);
         registerIntProperty("size", size);
-        // reuse nx,ny,sx,sy from base class
+        // normalized coords in [0..1]; if set (>=0) they take precedence
+        registerFloatProperty("nx", nx);
+        registerFloatProperty("ny", ny);
+        // pixel coords (screen space)
+        registerFloatProperty("sx", sx);
+        registerFloatProperty("sy", sy);
         // colors (not yet used by shader, but stored)
         registerFloatProperty("r", r);
         registerFloatProperty("g", g);
@@ -32,14 +36,19 @@ public:
     std::string font; // font path or empty to use default discovery
     int size = 24;
 
+    float nx = -1.0f;
+    float ny = -1.0f;
+
+    float sx = 0.0f;
+    float sy = 0.0f;
+
     float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
 };
 
 namespace {
     struct UIText_OBJ_Registrar {
         UIText_OBJ_Registrar() {
-            // Register an explicit override creator for subclass 'text' of base class 'ui'
-            ObjectFactory::overrideCreate("ui", "text", []() -> std::unique_ptr<Object> {
+            ObjectFactory::registerClass("ui", []() -> std::unique_ptr<Object> {
                 return std::make_unique<UIText_OBJ>();
             });
         }

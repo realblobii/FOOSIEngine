@@ -179,22 +179,8 @@ objManager::objManager(const std::vector<std::string>& objFiles) {
 }
 
 std::unique_ptr<Object> objManager::obj_load(const std::string& obj_class, const std::string& obj_subclass) {
-    std::unique_ptr<Object> obj;
-
-    // Prefer a subclass-specific override creator if one is registered (baseClass + subclass)
-    if (!obj_subclass.empty()) {
-        obj = ObjectFactory::tryCreateOverride(obj_class, obj_subclass);
-    }
-
-    // Fall back to base class creator
-    if (!obj) {
-        obj = ObjectFactory::tryCreate(obj_class);
-    }
-
-    // If still not found, call create() to emit the error message and return nullptr
-    if (!obj) {
-        return ObjectFactory::create(obj_class);
-    }
+    auto obj = ObjectFactory::create(obj_class);
+    if (!obj) return nullptr;
 
     obj->obj_class = obj_class;
     obj->obj_subclass = obj_subclass;
@@ -256,10 +242,10 @@ Object* objManager::instantiate(const std::string& obj_class,
     }
 
     // Resolve texture using current texref (properties may have changed texref)
-    // Previously UI objects skipped automatic texture resolution; allow UI objects to resolve
-    // so that the base UI class can render textures. UIText (subclass "text") will be
-    // specially handled by the GuiLayer text renderer and won't draw the resolved texture.
-    obj->resolveTexture(*this);
+    // UI objects don't use engine texture resolution, so skip resolve for ui class
+    if (obj->obj_class != "ui") {
+        obj->resolveTexture(*this);
+    }
 
     registry.push_back(std::move(obj));
     Object* objPtr = registry.back().get();
