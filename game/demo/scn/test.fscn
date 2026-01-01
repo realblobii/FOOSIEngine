@@ -10,6 +10,12 @@
         font "demo/fonts/DMSans.ttf";
         size 24;
     ];
+    UI logo ui.logo 0.9 0.1
+    [
+        texture "demo/player.png";
+        w 64;
+        h 64;
+    ];
     SCENE bob.fscn 4.5 4.5 1;
 };
 #ENDSCN

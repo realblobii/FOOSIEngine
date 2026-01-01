@@ -68,11 +68,21 @@ void GuiLayer::prepare(renderPipeline* pipeline) {
 }
 
 void GuiLayer::render(renderPipeline* pipeline) {
-    // Render UI text entries (both programmatic entries added via addTextAtNDC()
-    // and scene-instantiated UI objects of class="ui" subclass="text").
+    // Render UI entries (textures and text). Text objects (subclass="text") are handled
+    // by the text renderer; other UI objects render their resolved `texture` as a UI quad.
 
-    // Ensure FreeType + fonts are available
+    // Ensure FreeType + fonts are available for text rendering
     if (!fontHandle) return;
+
+    // Ensure texture images for non-text UI objects are present in the layer's rawImages
+    if (engine && engine->objMgr) {
+        for (auto &p : engine->objMgr->registry) {
+            if (!p) continue;
+            if (p->obj_class != "ui") continue;
+            if (p->obj_subclass == "text") continue; // text handled separately
+            if (!p->texture.empty()) ensureImageLoaded(p->texture);
+        }
+    }
 
     // Helper lambda: ensure glyphs exist for a given font/size/text and queue raw images
     auto ensureGlyphsFor = [&](const std::string &font, int size, const std::string &text) -> bool {
@@ -186,8 +196,34 @@ void GuiLayer::render(renderPipeline* pipeline) {
         RenderLayer::prepare(pipeline);
     }
 
-    // Build vertices for all UI entries and object-derived UI texts
+    // Build vertices for all UI entries: first images (non-text UI objects), then text
     std::vector<float> verts;
+
+    auto appendImageVerts = [&](const std::string &texPath, int startX, int startY, float overrideW = 0.0f, float overrideH = 0.0f) {
+        if (!atlasMap.count(texPath)) { if (rawImages.count(texPath)) std::cerr << "GuiLayer: missing atlas entry for texPath=" << texPath << "\n"; return; }
+        SubTexture uv = atlasMap[texPath];
+        auto &ri = rawImages[texPath];
+        int iw = ri.w; int ih = ri.h;
+        if (overrideW > 0.0f) iw = int(overrideW);
+        if (overrideH > 0.0f) ih = int(overrideH);
+        int x0px = startX;
+        int y0px = startY;
+        int x1px = x0px + iw;
+        int y1px = y0px + ih;
+        float z = -0.00002f;
+        float x0 = pipeline->screenToNDCx(x0px);
+        float y0 = pipeline->screenToNDCy(y0px);
+        float x1 = pipeline->screenToNDCx(x1px);
+        float y1 = pipeline->screenToNDCy(y1px);
+
+        verts.push_back(x0); verts.push_back(y0); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u0); verts.push_back(uv.v0);
+        verts.push_back(x1); verts.push_back(y0); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u1); verts.push_back(uv.v0);
+        verts.push_back(x1); verts.push_back(y1); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u1); verts.push_back(uv.v1);
+
+        verts.push_back(x1); verts.push_back(y1); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u1); verts.push_back(uv.v1);
+        verts.push_back(x0); verts.push_back(y1); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u0); verts.push_back(uv.v1);
+        verts.push_back(x0); verts.push_back(y0); verts.push_back(z); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(1.0f); verts.push_back(uv.u0); verts.push_back(uv.v0);
+    };
 
     auto appendTextVerts = [&](const std::string &font, int size, const std::string &text, int startX, int startY) {
         int x = startX;
@@ -230,7 +266,36 @@ void GuiLayer::render(renderPipeline* pipeline) {
         appendTextVerts(useFont, e.size, e.text, e.screenX, e.screenY);
     }
 
-    // Scene objects
+    // Scene objects: first add image-based UI objects (non-text)
+    if (engine && engine->objMgr) {
+        for (auto &p : engine->objMgr->registry) {
+            if (!p) continue;
+            if (p->obj_class != "ui") continue;
+            if (p->obj_subclass == "text") continue; // handled by text pass
+
+            int screenX = 0, screenY = 0;
+            // UIBase properties are optional; use normalized coords if present
+            // Try dynamic cast to UIBase_OBJ to read w/h if present
+            auto *uiBase = dynamic_cast<UIBase_OBJ*>(p.get());
+            if (uiBase && uiBase->nx >= 0.0f && uiBase->ny >= 0.0f) {
+                screenX = int(uiBase->nx * float(engine->virt_sx));
+                screenY = int(uiBase->ny * float(engine->virt_sy));
+            } else if (uiBase && (uiBase->sx != 0.0f || uiBase->sy != 0.0f)) {
+                screenX = int(uiBase->sx);
+                screenY = int(uiBase->sy);
+            } else {
+                screenX = int(p->lx);
+                screenY = int(p->ly);
+            }
+
+            float overrideW = uiBase ? uiBase->w : 0.0f;
+            float overrideH = uiBase ? uiBase->h : 0.0f;
+
+            if (!p->texture.empty()) appendImageVerts(p->texture, screenX, screenY, overrideW, overrideH);
+        }
+    }
+
+    // Then add text objects
     if (engine && engine->objMgr) {
         for (auto &p : engine->objMgr->registry) {
             if (!p) continue;
